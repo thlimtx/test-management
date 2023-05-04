@@ -1,3 +1,3 @@
 export const Screen = (props: any) => {
-  return <div className="flex min-h-screen">{props.children}</div>;
+  return <div className="flex min-h-screen bg-primaryBg">{props.children}</div>;
 };
