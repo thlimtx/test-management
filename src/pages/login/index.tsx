@@ -1,9 +1,13 @@
-const Home = () => {
+import { Screen } from "@/components/Screen";
+
+const Login = () => {
   return (
-    <div className="flex min-h-screen">
-      <div>Login</div>
-    </div>
+    <Screen>
+      <div className="flex flex-col min-h-screen items-center justify-between">
+        Text
+      </div>
+    </Screen>
   );
 };
 
-export default Home;
+export default Login;

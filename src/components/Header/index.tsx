@@ -1,13 +1,28 @@
+import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAppleWhole } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "../Button";
 
 export const Header = (props: any) => {
+  const router = useRouter();
   return (
-    <div className="shadow bg-primaryBg p-2 flex-row items-center">
-      <div>Title</div>
+    <div
+      className={`h-13 mb-1 w-full shadow bg-primaryBg p-2 flex flex-row items-center ${props.className}`}
+      style={props.style}
+    >
+      <div className="flex-1">Title</div>
       {/* <FontAwesomeIcon icon={faAppleWhole} size="sm" /> */}
-      <Button />
+      <Button
+        text="Sign up"
+        className="mr-2 rounded-full"
+        type="invert"
+        onPress={() => router.push("/signup")}
+      />
+      <Button
+        text="Login"
+        className="rounded-full"
+        onPress={() => router.push("/login")}
+      />
     </div>
   );
 };
