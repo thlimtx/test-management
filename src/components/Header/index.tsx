@@ -7,7 +7,7 @@ export const Header = (props: any) => {
   const router = useRouter();
   return (
     <div
-      className={`h-13 mb-1 w-full shadow bg-primaryBg p-2 flex flex-row items-center ${props.className}`}
+      className={`fixed header-height mb-1 w-full shadow bg-primaryBg p-2 flex flex-row items-center ${props.className}`}
       style={props.style}
     >
       <div className="flex-1">Title</div>
