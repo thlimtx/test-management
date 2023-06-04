@@ -1,9 +1,16 @@
+import { Button } from "@/components/Button";
 import { prisma } from "../../../server/db/client";
 import { Screen } from "@/components/Screen";
 
 const Home = (props: any) => {
   const createUser = async (item: any) => {
     const res = await fetch("api/user", {
+      method: "POST",
+      body: JSON.stringify(item),
+    });
+  };
+  const createProject = async (item: any) => {
+    const res = await fetch("api/project", {
       method: "POST",
       body: JSON.stringify(item),
     });
@@ -19,6 +26,12 @@ const Home = (props: any) => {
       >
         Press
       </div>
+      <Button
+        onPress={() => {
+          createProject({ name: "p1" });
+        }}
+        text="Create Project"
+      />
     </Screen>
   );
 };
