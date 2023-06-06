@@ -8,7 +8,172 @@ datasource db {
 }
 
 model User {
-  id      Int      @id @default(autoincrement())
-  name    String?  @db.VarChar(255)
-  email   String   @db.VarChar(255)
+  id        Int      @id @default(autoincrement())
+  name      String?  @db.VarChar(255)
+  email     String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  member    Member[]
+}
+
+model Project {
+  id           Int           @id @default(autoincrement())
+  name         String?       @db.VarChar(50)
+  description  String?       @db.VarChar(255)
+  env          String?       @db.VarChar(255)
+  tools        String?       @db.VarChar(255)
+  version      String?       @db.VarChar(10)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now()) @updatedAt
+  members      Member[]
+  requirements Requirement[]
+  testPlans    TestPlan[]
+  testResults  TestResult[]
+  build        Build?
+  deploy       Deploy?
+}
+
+model Member {
+  projectId Int
+  userId    Int
+  project   Project @relation(fields: [projectId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+
+  role Role[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@id([projectId, userId])
+}
+
+enum Role {
+  OWNER
+  TESTER
+  QA
+}
+
+model Requirement {
+  id        Int     @id @default(autoincrement())
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id])
+
+  reqId       String      @unique
+  title       String?     @db.VarChar(50)
+  description String?     @db.VarChar(255)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now()) @updatedAt
+  reference   Reference[]
+}
+
+model TestPlan {
+  id             Int        @id @default(autoincrement())
+  projectId      Int
+  project        Project    @relation(fields: [projectId], references: [id])
+  title          String?    @db.VarChar(50)
+  description    String?    @db.VarChar(255)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @default(now()) @updatedAt
+  lastExecutedAt DateTime?
+  status         TestStatus @default(PENDING)
+
+  testCase  TestCase[]
+  reference Reference[]
+}
+
+model Reference {
+  testPlanId Int
+  reqId      Int
+  testPlan   TestPlan    @relation(fields: [testPlanId], references: [id])
+  req        Requirement @relation(fields: [reqId], references: [id])
+
+  @@id([testPlanId, reqId])
+}
+
+model TestCase {
+  id         Int      @id @default(autoincrement())
+  testPlanId Int
+  testPlan   TestPlan @relation(fields: [testPlanId], references: [id])
+
+  testCaseId     String       @unique
+  title          String?      @db.VarChar(50)
+  description    String?      @db.VarChar(255)
+  type           TestType     @default(MANUAL)
+  priority       TestPriority @default(LOW)
+  precondition   String?      @db.VarChar(255)
+  steps          String?      @db.VarChar(255)
+  data           String?      @db.VarChar(255)
+  expected       String?      @db.VarChar(255)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now()) @updatedAt
+  lastExecutedAt DateTime?
+  status         TestStatus   @default(PENDING)
+  script         String?      @db.VarChar(255)
+}
+
+enum TestType {
+  MANUAL
+  AUTO
+}
+
+enum TestPriority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum TestStatus {
+  PASSED
+  FAILED
+  PENDING
+}
+
+model TestResult {
+  id        Int     @id @default(autoincrement())
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id])
+
+  duration  String
+  rating    Int
+  status    TestStatus @default(PENDING)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now()) @updatedAt
+}
+
+model Build {
+  id          Int        @id @default(autoincrement())
+  projectId   Int        @unique
+  project     Project    @relation(fields: [projectId], references: [id])
+  description String?
+  script      String?
+  log         BuildLog[]
+}
+
+model BuildLog {
+  id      Int   @id @default(autoincrement())
+  buildId Int
+  build   Build @relation(fields: [buildId], references: [id])
+
+  createdAt DateTime   @default(now())
+  duration  String
+  status    TestStatus @default(PENDING)
+}
+
+model Deploy {
+  id          Int         @id @default(autoincrement())
+  projectId   Int         @unique
+  project     Project     @relation(fields: [projectId], references: [id])
+  description String?
+  script      String?
+  log         DeployLog[]
+}
+
+model DeployLog {
+  id       Int    @id @default(autoincrement())
+  deployId Int
+  deploy   Deploy @relation(fields: [deployId], references: [id])
+
+  createdAt DateTime   @default(now())
+  duration  String
+  status    TestStatus @default(PENDING)
 }
