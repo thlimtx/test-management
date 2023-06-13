@@ -17,6 +17,7 @@ module.exports = {
       primary: "purple",
       secondary: "white",
       primaryBg: "white",
+      screenBg: "#F5F5F5",
     },
   },
   plugins: [],
