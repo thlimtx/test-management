@@ -10,7 +10,9 @@ export const Header = (props: any) => {
       className={`fixed header-height mb-1 w-full shadow bg-primaryBg p-2 flex flex-row items-center ${props.className}`}
       style={props.style}
     >
-      <div className="flex-1">Title</div>
+      <div className="flex-1 flex flex-row px-2">
+        <img src="https://picsum.photos/30" />
+      </div>
       {/* <FontAwesomeIcon icon={faAppleWhole} size="sm" /> */}
       <Button
         text="Sign up"
