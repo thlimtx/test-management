@@ -1,6 +1,7 @@
 import { Button } from "@/components/Button";
 import { prisma } from "../../../server/db/client";
 import { Screen } from "@/components/Screen";
+import { jsonParse } from "@/util/format";
 
 const Home = (props: any) => {
   const createUser = async (item: any) => {
@@ -63,7 +64,7 @@ export const getServerSideProps = async () => {
   const allUsers = await prisma.user.findMany();
   return {
     props: {
-      user: allUsers,
+      user: jsonParse(allUsers),
     },
   };
 };
