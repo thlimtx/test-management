@@ -6,7 +6,7 @@ export const Box = (props: BoxProps) => {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-3 flex-1">
       <div
-        className="flex flex-1 flex-col shadow bg-secondary px-20 py-10 justify-around"
+        className="flex flex-1 flex-col shadow bg-secondary px-10 py-10 justify-around"
         style={{
           maxWidth: 500,
           maxHeight: 600,
