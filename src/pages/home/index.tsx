@@ -38,7 +38,11 @@ const Home = (props: any) => {
       <div>Home</div>
       <Button
         onPress={() => {
-          createUser({ name: "press4", email: "press4@press.com" });
+          createUser({
+            name: "press4",
+            email: "press4@press.com",
+            password: "test",
+          });
         }}
         text="Create User"
       />

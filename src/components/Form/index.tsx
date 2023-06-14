@@ -7,8 +7,6 @@ import { Box } from "../Box";
 export const Form = (props: FormProps) => {
   const { title, fields, buttons, register, footer } = props;
 
-  const onSubmit = (data: any) => props.onSubmit && props.onSubmit(data);
-
   return (
     <Box title={title} type="form">
       <div>
