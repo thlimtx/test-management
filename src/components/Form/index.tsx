@@ -18,7 +18,7 @@ export const Form = (props: FormProps) => {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-3 flex-1">
       <div
-        className="flex flex-1 flex-col shadow bg-secondary px-20 py-10"
+        className="flex flex-1 flex-col shadow bg-secondary px-20 py-10 justify-around"
         style={{
           maxWidth: 500,
           maxHeight: 600,
@@ -26,18 +26,20 @@ export const Form = (props: FormProps) => {
         }}
       >
         <p className="text-center text-3xl italic font-bold pb-4">{title}</p>
-        {map(fields, (item, index) => {
-          const { register: curRegister, ...rest } = item;
-          return (
-            <div key={`input${index}`}>
-              <TextInput
-                {...rest}
-                register={register}
-                registerOptions={curRegister}
-              />
-            </div>
-          );
-        })}
+        <div>
+          {map(fields, (item, index) => {
+            const { register: curRegister, ...rest } = item;
+            return (
+              <div key={`input${index}`}>
+                <TextInput
+                  {...rest}
+                  register={register}
+                  registerOptions={curRegister}
+                />
+              </div>
+            );
+          })}
+        </div>
         <div className="flex flex-row justify-end my-3">
           {map(buttons, (item, index) => {
             const { className, submit, ...rest } = item;
