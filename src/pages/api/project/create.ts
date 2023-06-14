@@ -14,14 +14,8 @@ const handler = async (req: any, res: any) => {
       version,
       members: {
         create: {
-          user: {
-            connect: { id: userId }, // Replace `userId` with the actual user ID
-          },
-          role: {
-            set: [Role.OWNER], // Set the role of the member
-          },
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          user: { connect: { id: userId } },
+          role: { set: [Role.OWNER] },
         },
       },
       createdAt: new Date(),
