@@ -2,8 +2,12 @@ import { Button } from "@/components/Button";
 import { prisma } from "../../../server/db/client";
 import { Screen } from "@/components/Screen";
 import { jsonParse } from "@/util/format";
+import { useRouter } from "next/router";
 
 const Home = (props: any) => {
+  const router = useRouter();
+  // todo: change to index
+  router.push("/");
   const createUser = async (item: any) => {
     const res = await fetch("api/user/create", {
       method: "POST",

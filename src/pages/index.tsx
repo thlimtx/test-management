@@ -20,7 +20,7 @@ const Home = (props: any) => {
           <Button
             className="rounded-full w-40 max-w-full py-3"
             text="Get Started"
-            onPress={() => router.push("/create-project")}
+            onPress={() => router.push("/project/create")}
           />
         </div>
       </Box>
