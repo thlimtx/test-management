@@ -24,7 +24,7 @@ export const Button = (props: ButtonProps) => {
     <div
       className={`shadow ${
         colors.bg
-      } border-primary border-2 px-3 py-1.5 cursor-pointer ${
+      } border-primary border-2 px-3 py-1.5 cursor-pointer rounded ${
         isHover ? "opacity-50" : ""
       } ${className}`}
       onClick={onPress}
