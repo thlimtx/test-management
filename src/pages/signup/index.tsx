@@ -11,7 +11,6 @@ const Signup = () => {
     watch,
     formState: { errors },
   } = useForm();
-  console.log(watch("password"));
 
   const createUser = async (item: any) => {
     const res = await fetch("api/user/create", {
