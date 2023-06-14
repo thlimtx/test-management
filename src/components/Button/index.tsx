@@ -2,18 +2,12 @@ import { useState } from "react";
 import { ButtonProps } from "./props";
 
 export const Button = (props: ButtonProps) => {
-  const {
-    className,
-    text,
-    type = "regular",
-    onPress,
-    textColor = "secondary",
-    bgColor = "primary",
-  } = props;
+  const { className, text, type = "regular", onPress } = props;
   const [isHover, setIsHover] = useState(false);
+
   const colors = {
-    text: `text-${type === "invert" ? bgColor : textColor}`,
-    bg: `bg-${type === "invert" ? textColor : bgColor}`,
+    text: type === "invert" ? "text-primary" : "text-secondary",
+    bg: type === "invert" ? "bg-secondary" : "bg-primary",
   };
 
   /**
