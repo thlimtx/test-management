@@ -5,10 +5,13 @@ import { useRouter } from "next/router";
 const CreateProject = () => {
   const router = useRouter();
 
+  // todo: Login session
+  const userId = 1;
+
   const createProject = async (item: any) => {
     const res = await fetch("../api/project/create", {
       method: "POST",
-      body: JSON.stringify({ ...item, userId: 1 }),
+      body: JSON.stringify({ ...item, userId }),
     });
   };
 
