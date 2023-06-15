@@ -5,6 +5,7 @@ export type ButtonProps = {
   onPress?: any;
   textColor?: string;
   bgColor?: string;
+  textClassName?: string;
 };
 
 export type ButtonType = "regular" | "invert";

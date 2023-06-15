@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ButtonProps } from "./props";
 
 export const Button = (props: ButtonProps) => {
-  const { className, text, type = "regular", onPress } = props;
+  const { className, text, type = "regular", onPress, textClassName } = props;
   const [isHover, setIsHover] = useState(false);
 
   const colors = {
@@ -24,14 +24,16 @@ export const Button = (props: ButtonProps) => {
     <div
       className={`shadow ${
         colors.bg
-      } border-primary border-2 px-3 py-1.5 cursor-pointer ${
+      } border-primary border-2 px-3 py-1.5 cursor-pointer rounded ${
         isHover ? "opacity-50" : ""
       } ${className}`}
       onClick={onPress}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <p className={`${colors.text} text-sm font-semibold`}>{text}</p>
+      <p className={`${colors.text} text-sm font-semibold ${textClassName}`}>
+        {text}
+      </p>
     </div>
   );
 };

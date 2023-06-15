@@ -11,7 +11,7 @@ export const TextInput = (props: TextInputProps) => {
     <div>
       <input
         type={type}
-        className="border border-opacity-100 rounded-sm w-full px-2 py-1 my-2"
+        className="border border-opacity-100 rounded-sm w-full px-3 py-1.5 my-2 text-sm"
         placeholder={`${placeholder}`}
         {...registerConfig}
         {...restProps}

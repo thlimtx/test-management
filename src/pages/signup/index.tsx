@@ -1,20 +1,37 @@
 import { Form } from "@/components/Form";
 import { Screen } from "@/components/Screen";
+import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
 
 const Signup = () => {
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+
+  const createUser = async (item: any) => {
+    const res = await fetch("api/user/create", {
+      method: "POST",
+      body: JSON.stringify({ ...item }),
+    });
+  };
+  const onSubmit = (data: any) => {
+    createUser(data)
+      .then(() => router.push("/home"))
+      .catch(() => alert("Sign up failed."));
+  };
   return (
     <Screen>
       <Form
+        register={register}
         title="Register"
         fields={[
           {
-            id: "fname",
-            placeholder: "First Name",
-            register: { required: true },
-          },
-          {
-            id: "lname",
-            placeholder: "Last Name",
+            id: "name",
+            placeholder: "Name",
             register: { required: true },
           },
           {
@@ -33,11 +50,15 @@ const Signup = () => {
             id: "cpass",
             placeholder: "Confirm Password",
             type: "password",
-            register: { required: true },
+            register: {
+              required: true,
+              validate: (value) => value === watch("password"),
+            },
           },
         ]}
-        buttons={[{ text: "Sign up", submit: true, type: "invert" }]}
-        onSubmit={(data) => console.log(data)}
+        buttons={[
+          { text: "Sign up", onPress: handleSubmit(onSubmit), type: "invert" },
+        ]}
       />
     </Screen>
   );

@@ -1,10 +1,26 @@
+import { Role } from "@prisma/client";
 import { prisma } from "server/db/client";
 
 const handler = async (req: any, res: any) => {
   const { body } = req;
-  const { name } = JSON.parse(body);
+  const { userId, name, description, env, tools, version } = JSON.parse(body);
+
   const project = await prisma.project.create({
-    data: { name },
+    data: {
+      name,
+      description,
+      env,
+      tools,
+      version,
+      members: {
+        create: {
+          user: { connect: { id: userId } },
+          role: { set: [Role.OWNER] },
+        },
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
   });
   return res.status(200).json(project);
 };
