@@ -19,6 +19,7 @@ module.exports = {
       primaryBg: "white",
       screenBg: "#F5F5F5",
       fade: "gray",
+      textPrimary: "black",
     },
   },
   plugins: [],
