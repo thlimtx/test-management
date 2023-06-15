@@ -14,10 +14,11 @@ module.exports = {
       },
     },
     colors: {
-      primary: "purple",
+      primary: "#8000FF",
       secondary: "white",
       primaryBg: "white",
       screenBg: "#F5F5F5",
+      fade: "gray",
     },
   },
   plugins: [],
