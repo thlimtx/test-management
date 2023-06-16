@@ -8,6 +8,7 @@
   --background-end-rgb: 245, 245, 245;
   --header-offset: 50px;
   --sidebar-width: 200px;
+  --primary-color: #8000ff;
 }
 
 @media (prefers-color-scheme: dark) {
