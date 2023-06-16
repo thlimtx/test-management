@@ -1,3 +1,5 @@
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
+
 export type ButtonProps = {
   className?: string;
   type?: ButtonType;
@@ -6,6 +8,7 @@ export type ButtonProps = {
   textColor?: string;
   bgColor?: string;
   textClassName?: string;
+  icon?: IconProp;
 };
 
 export type ButtonType = "regular" | "invert";

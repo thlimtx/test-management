@@ -1,8 +1,16 @@
 import { useState } from "react";
 import { ButtonProps } from "./props";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export const Button = (props: ButtonProps) => {
-  const { className, text, type = "regular", onPress, textClassName } = props;
+  const {
+    className,
+    text,
+    type = "regular",
+    onPress,
+    textClassName,
+    icon,
+  } = props;
   const [isHover, setIsHover] = useState(false);
 
   const colors = {
@@ -22,7 +30,7 @@ export const Button = (props: ButtonProps) => {
 
   return (
     <div
-      className={`shadow ${
+      className={`flex flex-row items-center shadow ${
         colors.bg
       } border-primary border-2 px-3 py-1.5 cursor-pointer rounded ${
         isHover ? "opacity-50" : ""
@@ -31,6 +39,13 @@ export const Button = (props: ButtonProps) => {
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
+      {icon && (
+        <FontAwesomeIcon
+          icon={icon}
+          size="sm"
+          className={`mr-2 ${colors.text} ${textClassName}`}
+        />
+      )}
       <p className={`${colors.text} text-sm font-semibold ${textClassName}`}>
         {text}
       </p>
