@@ -32,6 +32,17 @@ body {
   width: var(--sidebar-width);
 }
 
+.sidebar-item:hover {
+  background-color: var(--primary-color);
+  color: white;
+  cursor: pointer;
+}
+.sidebar-exit:hover {
+  background-color: rgb(243, 84, 84);
+  color: white;
+  cursor: pointer;
+}
+
 .header-height {
   height: var(--header-offset);
 }
@@ -42,6 +53,10 @@ body {
 
 .hyperlink {
   color: blue;
+}
+
+.button {
+  cursor: pointer;
 }
 
 @media screen and (max-width: 800px) {
