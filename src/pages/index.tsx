@@ -89,7 +89,7 @@ const Home = (props: any) => {
                 return (
                   <div
                     key={index}
-                    className="bg-primaryBg mr-6 mb-6 px-3 py-2 w-96 h-32 flex flex-col justify-between"
+                    className="bg-primaryBg mr-6 mb-6 px-3 py-2 w-96 h-32 flex flex-col justify-between button"
                     onClick={() => onPressProject(item.id)}
                   >
                     <div className="flex flex-row items-center justify-between mb-1">
@@ -135,7 +135,11 @@ const Home = (props: any) => {
                 onChange={(text) => onSearch(`${text}`)}
               />
             </div>
-            <Table columns={columns} dataSource={projects} />
+            <Table
+              columns={columns}
+              dataSource={projects}
+              rowKey={(data) => `${data.id}`}
+            />
           </div>
 
           {/** SIDEBAR */}
