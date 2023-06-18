@@ -1,41 +1,65 @@
+import { Details } from "@/components/Details";
 import { Screen } from "@/components/Screen";
 import { Sidebar } from "@/components/Sidebar";
-import { jsonParse } from "@/util/format";
-import { useRouter } from "next/router";
+import { formatDate, jsonParse } from "@/util/format";
+import { useForm } from "react-hook-form";
 import { prisma } from "server/db/client";
 
 const Requirements = (props: any) => {
-  const { requirements } = props;
-  const router = useRouter();
-  const projectId = router.query.id;
-  const reqId = router.query.reqId;
+  const { requirement } = props;
+  const data = {
+    ...requirement,
+    createdAt: formatDate(requirement?.createdAt),
+  };
+
   // todo: Login session
   const userId = 1;
+  const { register, handleSubmit } = useForm();
 
-  const renderDetails = (title: string, data: string) => {
-    return (
-      <div>
-        <p className="text-fade text-xs my-1.5">{title}</p>
-        <p>{data}</p>
-      </div>
-    );
-  };
+  // todo: handle edit api
+  const onSubmit = (data: any) => console.log({ data });
 
   return (
     <Screen>
       <div className="flex flex-1">
         <Sidebar />
-        <div className="flex-1 py-3 px-5">
-          <p className="text-2xl font-bold italic mb-5">Requirements</p>
-          <div className="p-4 my-2 bg-primaryBg shadow">
-            <div className="flex flex-row justify-between">
-              {renderDetails("Name", "Req 1")}
-              {renderDetails("Requirement ID", "req001")}
-            </div>
-            {renderDetails("Desription", "req desc")}
-            {renderDetails("Date created", "23/12/2022")}
-          </div>
-        </div>
+        <Details
+          editable
+          register={register}
+          title="Requirements"
+          onPressSave={handleSubmit(onSubmit)}
+          data={data}
+          fields={[
+            {
+              render: ({ renderDetails }) => {
+                return (
+                  <div className="flex flex-row justify-between">
+                    {renderDetails({
+                      id: "title",
+                      title: "Title",
+                      placeholder: "Enter Title",
+                    })}
+                    {renderDetails({
+                      id: "reqId",
+                      title: "Requirement ID",
+                      placeholder: "Enter Requirement ID",
+                    })}
+                  </div>
+                );
+              },
+            },
+            {
+              id: "description",
+              title: "Description",
+              placeholder: "Enter Description",
+            },
+            {
+              id: "createdAt",
+              title: "Created At",
+              editable: false,
+            },
+          ]}
+        />
       </div>
     </Screen>
   );
@@ -43,13 +67,13 @@ const Requirements = (props: any) => {
 
 export const getServerSideProps = async (context: any) => {
   // todo: Login session
-  const { id } = context.query;
-  const requirements = await prisma.requirement.findMany({
-    where: { projectId: { equals: parseInt(id) } },
+  const { reqId } = context.query;
+  const requirement = await prisma.requirement.findFirst({
+    where: { id: { equals: parseInt(reqId) } },
   });
   return {
     props: {
-      requirements: jsonParse(requirements),
+      requirement: jsonParse(requirement),
     },
   };
 };
