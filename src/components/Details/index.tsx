@@ -33,7 +33,7 @@ export const Details = (props: DetailsProps) => {
   const renderDetails = (item: FieldItem) => {
     const { title, register: curRegister, render, ...rest } = item;
     return (
-      <div>
+      <div className="flex flex-1 flex-col">
         <p className="text-fade text-xs my-1.5">{title}</p>
         {editable && isEditing && item.editable !== false ? (
           <TextInput

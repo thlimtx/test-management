@@ -51,7 +51,11 @@ const Dashboard = (props: any) => {
           <div className="p-4 my-2 bg-primaryBg shadow">
             <p className="text-xl font-bold">Overview</p>
             <p className="text-xl font-bold">Log</p>
-            <Table columns={columns} dataSource={testResults} />
+            <Table
+              columns={columns}
+              dataSource={testResults}
+              rowKey={(data) => `${data.id}`}
+            />
           </div>
         </div>
       </div>

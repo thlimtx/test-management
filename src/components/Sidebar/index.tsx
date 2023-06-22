@@ -18,7 +18,7 @@ export const Sidebar = (props: any) => {
     { id: "dashboard", name: "Dashboard", icon: faChartSimple },
     { id: "requirement", name: "Requirements", icon: faListCheck },
     { id: "build", name: "Build", icon: faScrewdriverWrench },
-    { id: "test", name: "Test", icon: faVialCircleCheck },
+    { id: "test-plan", name: "Test Plan", icon: faVialCircleCheck },
     { id: "deploy", name: "Deploy", icon: faCloudArrowUp },
     { id: "details", name: "Details", icon: faCircleInfo },
   ];
