@@ -18,6 +18,7 @@ export const Details = (props: DetailsProps) => {
     title,
     fields,
     register,
+    onPressBack,
     onPressEdit,
     onPressSave,
     onPressCancel,
@@ -25,9 +26,6 @@ export const Details = (props: DetailsProps) => {
     isEditing,
   } = props;
 
-  const router = useRouter();
-
-  const onPressBack = () => router.back();
   /**
    * Render the default component for each field
    * @param item Each item in field props

@@ -2,6 +2,7 @@ import { Details } from "@/components/Details";
 import { Screen } from "@/components/Screen";
 import { Sidebar } from "@/components/Sidebar";
 import { formatDate, jsonParse } from "@/util/format";
+import { replace } from "lodash";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -34,6 +35,8 @@ const Requirements = (props: any) => {
     }
   };
 
+  const onPressBack = () =>
+    router.push(replace(router.asPath, requirement?.id, ""));
   const onPressCancel = () => setIsEditing(false);
   const onPressEdit = () => setIsEditing(true);
 
@@ -49,6 +52,7 @@ const Requirements = (props: any) => {
           editable
           register={register}
           title="Requirements"
+          onPressBack={onPressBack}
           onPressCancel={onPressCancel}
           onPressEdit={onPressEdit}
           onPressSave={handleSubmit(onSubmit)}
@@ -64,9 +68,9 @@ const Requirements = (props: any) => {
                       placeholder: "Enter Title",
                     })}
                     {renderDetails({
-                      id: "reqId",
-                      title: "Requirement ID",
-                      placeholder: "Enter Requirement ID",
+                      id: "reqCode",
+                      title: "Requirement Code",
+                      placeholder: "Enter Requirement Code",
                     })}
                   </div>
                 );

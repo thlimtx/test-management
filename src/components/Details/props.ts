@@ -44,6 +44,11 @@ export type DetailsProps = {
    */
   fields?: FieldItem[];
   /**
+   * On press back
+   * @returns void
+   */
+  onPressBack?: () => void;
+  /**
    * On press edit
    * @returns void
    */
