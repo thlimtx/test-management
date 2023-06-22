@@ -5,5 +5,5 @@ export const jsonParse = (data: any) => {
 };
 
 export const formatDate = (date: any, format?: string) => {
-  return moment(date).format(format ?? "DD/MM/YYYY");
+  return date ? moment(date).format(format ?? "DD/MM/YYYY") : "-";
 };
