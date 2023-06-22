@@ -3,6 +3,7 @@ import { TextInput } from "../TextInput";
 import { Button } from "../Button";
 import map from "lodash/map";
 import {
+  faArrowLeft,
   faFloppyDisk,
   faPen,
   faXmark,
@@ -79,7 +80,7 @@ export const Details = (props: DetailsProps) => {
               <Button
                 text="Back"
                 className="mr-3 border-textPrimary"
-                icon={faPen}
+                icon={faArrowLeft}
                 type="invert"
                 textClassName="text-textPrimary"
                 onPress={onPressBack}
