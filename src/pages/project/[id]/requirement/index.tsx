@@ -7,6 +7,8 @@ import { useRouter } from "next/router";
 import { prisma } from "server/db/client";
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
 const Requirements = (props: any) => {
   const { requirements } = props;
@@ -14,6 +16,29 @@ const Requirements = (props: any) => {
   const projectId = router.query.id;
   // todo: Login session
   const userId = 1;
+
+  const deleteRequirement = async (item: any) => {
+    const res = await fetch("../../api/requirement/delete", {
+      method: "POST",
+      body: JSON.stringify({ ...item }),
+    });
+    if (res.ok) {
+      router.replace(router.asPath);
+    } else {
+      alert("Failed to delete requirement");
+    }
+  };
+
+  // todo: search
+  const onSearch = (search: string) => {};
+
+  const onPressDelete = (id: any) => {
+    deleteRequirement({ id });
+  };
+
+  const onPressAddRequirement = () => {
+    router.push(`/project/${projectId}/requirement/create`);
+  };
 
   const columns: ColumnsType<any> = [
     {
@@ -35,14 +60,22 @@ const Requirements = (props: any) => {
       dataIndex: "description",
       key: "description",
     },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => {
+        return (
+          <FontAwesomeIcon
+            className="button self-center"
+            style={{ color: "red" }}
+            onClick={() => onPressDelete(record.id)}
+            icon={faXmark}
+          />
+        );
+      },
+      width: 50,
+    },
   ];
-
-  // todo: search
-  const onSearch = (search: string) => {};
-
-  const onPressAddRequirement = () => {
-    router.push(`/project/${projectId}/requirement/create`);
-  };
 
   return (
     <Screen>
