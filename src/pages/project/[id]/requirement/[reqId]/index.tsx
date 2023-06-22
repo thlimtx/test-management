@@ -2,6 +2,8 @@ import { Details } from "@/components/Details";
 import { Screen } from "@/components/Screen";
 import { Sidebar } from "@/components/Sidebar";
 import { formatDate, jsonParse } from "@/util/format";
+import { useRouter } from "next/router";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { prisma } from "server/db/client";
 
@@ -12,21 +14,43 @@ const Requirements = (props: any) => {
     createdAt: formatDate(requirement?.createdAt),
   };
 
+  const router = useRouter();
+
   // todo: Login session
   const userId = 1;
+  const [isEditing, setIsEditing] = useState(false);
   const { register, handleSubmit } = useForm();
 
-  // todo: handle edit api
-  const onSubmit = (data: any) => console.log({ data });
+  const updateRequirement = async (item: any) => {
+    const res = await fetch("../../../api/requirement/update", {
+      method: "POST",
+      body: JSON.stringify({ ...item }),
+    });
+    if (res.ok) {
+      setIsEditing(false);
+      router.replace(router.asPath);
+    } else {
+      alert("Failed to update requirement");
+    }
+  };
+
+  const onPressCancel = () => setIsEditing(false);
+  const onPressEdit = () => setIsEditing(true);
+
+  const onSubmit = (data: any) =>
+    updateRequirement({ id: requirement?.id, ...data });
 
   return (
     <Screen>
       <div className="flex flex-1">
         <Sidebar />
         <Details
+          isEditing={isEditing}
           editable
           register={register}
           title="Requirements"
+          onPressCancel={onPressCancel}
+          onPressEdit={onPressEdit}
           onPressSave={handleSubmit(onSubmit)}
           data={data}
           fields={[
