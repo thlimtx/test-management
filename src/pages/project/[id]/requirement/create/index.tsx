@@ -5,6 +5,7 @@ import { TextInput } from "@/components/TextInput";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { faFloppyDisk, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { replace } from "lodash";
 
 const CreateRequirement = (props: any) => {
   const router = useRouter();
@@ -24,15 +25,16 @@ const CreateRequirement = (props: any) => {
       method: "POST",
       body: JSON.stringify({ ...item, projectId }),
     });
+    if (res.ok) {
+      const createdRequirement = await res.json();
+      router.push(replace(router.asPath, "create", createdRequirement?.id));
+    } else {
+      alert("Failed to create requirement");
+    }
   };
 
   const onPressCancel = () => router.back();
-  const onSubmit = (data: any) => {
-    console.log(data);
-    console.log(projectId);
-
-    createRequirement(data);
-  };
+  const onSubmit = (data: any) => createRequirement(data);
 
   const renderDetails = (title: string, id: string) => {
     return (
