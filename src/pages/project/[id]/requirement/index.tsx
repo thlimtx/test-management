@@ -42,11 +42,11 @@ const Requirements = (props: any) => {
 
   const columns: ColumnsType<any> = [
     {
-      title: "Id",
-      key: "reqId",
+      title: "Code",
+      key: "reqCode",
       render: (value) => (
         <a href={`/project/${projectId}/requirement/${value.id}`}>
-          {value.reqId}
+          {value.reqCode}
         </a>
       ),
     },

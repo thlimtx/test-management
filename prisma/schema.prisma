@@ -59,7 +59,7 @@ model Requirement {
   projectId Int
   project   Project @relation(fields: [projectId], references: [id])
 
-  reqId       String      @unique
+  reqCode     String      @unique
   title       String?     @db.VarChar(50)
   description String?     @db.VarChar(255)
   createdAt   DateTime    @default(now())
@@ -71,6 +71,7 @@ model TestPlan {
   id             Int        @id @default(autoincrement())
   projectId      Int
   project        Project    @relation(fields: [projectId], references: [id])
+  testPlanCode   String     @unique
   title          String?    @db.VarChar(50)
   description    String?    @db.VarChar(255)
   createdAt      DateTime   @default(now())
@@ -96,7 +97,7 @@ model TestCase {
   testPlanId Int
   testPlan   TestPlan @relation(fields: [testPlanId], references: [id])
 
-  testCaseId     String       @unique
+  testCaseCode   String       @unique
   title          String?      @db.VarChar(50)
   description    String?      @db.VarChar(255)
   type           TestType     @default(MANUAL)

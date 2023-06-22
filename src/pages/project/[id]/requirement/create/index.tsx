@@ -77,7 +77,7 @@ const CreateRequirement = (props: any) => {
             </div>
           </div>
           <div className="p-4 my-2 bg-primaryBg shadow">
-            {renderDetails("Requirement ID", "reqId")}
+            {renderDetails("Requirement Code", "reqCode")}
             {renderDetails("Name", "title")}
             {renderDetails("Description", "description")}
           </div>
