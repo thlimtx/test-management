@@ -42,6 +42,17 @@ const TestPlans = (props: any) => {
       alert("Failed to update test plan");
     }
   };
+  const removeReference = async (item: any) => {
+    const res = await fetch("../../../api/reference/delete", {
+      method: "POST",
+      body: JSON.stringify({ ...item, testPlanId: parseInt(`${id}`) }),
+    });
+    if (res.ok) {
+      router.replace(router.asPath);
+    } else {
+      alert("Failed to remove reference");
+    }
+  };
 
   const onPressBack = () => router.push(replace(router.asPath, id, ""));
   const onPressCancel = () => setIsEditing(false);
@@ -59,7 +70,7 @@ const TestPlans = (props: any) => {
 
   // TODO: remove reference
   const onPressRemove = (id: any) => {
-    // removeRequirement({ id });
+    removeReference({ reqId: id });
   };
 
   const columns: ColumnsType<any> = [
