@@ -48,7 +48,9 @@ const TestPlans = (props: any) => {
   const onPressEdit = () => setIsEditing(true);
 
   // TODO: add reference
-  const onPressAddRequirement = () => {};
+  const onPressAddRequirement = () =>
+    router.push(router.asPath + "/requirement");
+
   // TODO: create test case
   const onPressAddTestCase = () => {};
   // TODO: search
