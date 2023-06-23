@@ -58,17 +58,15 @@ const TestPlans = (props: any) => {
   const onPressCancel = () => setIsEditing(false);
   const onPressEdit = () => setIsEditing(true);
 
-  // TODO: add reference
   const onPressAddRequirement = () =>
     router.push(router.asPath + "/requirement");
 
-  // TODO: create test case
-  const onPressAddTestCase = () => {};
+  const onPressAddTestCase = () =>
+    router.push(router.asPath + "/test-case/create");
   // TODO: search
   const onSearch = (data: any) => {};
   const onSubmit = (data: any) => updateTestPlan({ id, ...data });
 
-  // TODO: remove reference
   const onPressRemove = (id: any) => {
     removeReference({ reqId: id });
   };
