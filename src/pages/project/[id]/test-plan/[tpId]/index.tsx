@@ -177,7 +177,7 @@ const TestPlans = (props: any) => {
                           width: 50,
                           render: (value) => (
                             <a
-                              href={`/project/${projectId}/test-case/${value.id}`}
+                              href={`/project/${projectId}/test-plan/${id}/test-case/${value.id}`}
                             >
                               {value.testCaseCode}
                             </a>
