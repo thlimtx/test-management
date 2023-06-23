@@ -6,7 +6,13 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { prisma } from "server/db/client";
-import { projectFields } from "./data";
+import { memberColumns, projectFields } from "./data";
+import { Button } from "@/components/Button";
+import { faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { TextInput } from "@/components/TextInput";
+import { Table } from "antd";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { find, includes } from "lodash";
 
 const ProjectDetails = (props: any) => {
   const { project } = props;
@@ -23,8 +29,6 @@ const ProjectDetails = (props: any) => {
   const { register, handleSubmit } = useForm();
 
   const updateProjectDetails = async (item: any) => {
-    console.log(item);
-
     const res = await fetch("../../api/project/update", {
       method: "POST",
       body: JSON.stringify({ ...item }),
@@ -43,6 +47,10 @@ const ProjectDetails = (props: any) => {
 
   // TODO: search
   const onSearch = (data: any) => {};
+  const onPressRemove = (data: any) => {
+    console.log(data);
+  };
+  const onPressAddMember = () => {};
   const onSubmit = (data: any) => {
     updateProjectDetails({ id, ...data });
   };
@@ -61,7 +69,60 @@ const ProjectDetails = (props: any) => {
           onPressEdit={onPressEdit}
           onPressSave={handleSubmit(onSubmit)}
           data={data}
-          fields={[...projectFields]}
+          fields={[
+            ...projectFields,
+            {
+              render: ({}) => {
+                return (
+                  <div className="">
+                    <p className="text-lg font-bold my-3">Members</p>
+                    <div className="flex flex-row justify-between items-center">
+                      <Button
+                        type="invert"
+                        text="Add"
+                        className="border-textPrimary"
+                        textClassName="text-textPrimary"
+                        icon={faPlus}
+                        onPress={onPressAddMember}
+                      />
+                      <TextInput
+                        placeholder="Search"
+                        onChange={(text) => onSearch(`${text}`)}
+                      />
+                    </div>
+                    <Table
+                      columns={[
+                        ...memberColumns,
+                        {
+                          title: "Action",
+                          key: "action",
+                          render: (_, record) => {
+                            return (
+                              userId ===
+                                find(project.members, (o) =>
+                                  includes(o.role, "OWNER")
+                                ).userId &&
+                              !includes(record.role, "OWNER") && (
+                                <FontAwesomeIcon
+                                  className="button self-center"
+                                  style={{ color: "red" }}
+                                  onClick={() => onPressRemove(record.userId)}
+                                  icon={faXmark}
+                                />
+                              )
+                            );
+                          },
+                          width: 50,
+                        },
+                      ]}
+                      dataSource={project.members}
+                      rowKey={(data) => `${data.id}`}
+                    />
+                  </div>
+                );
+              },
+            },
+          ]}
         />
       </div>
     </Screen>
@@ -73,6 +134,11 @@ export const getServerSideProps = async (context: any) => {
   const { id } = context.query;
   const project = await prisma.project.findFirst({
     where: { id: { equals: parseInt(id) } },
+    include: {
+      members: {
+        include: { user: true },
+      },
+    },
   });
   return {
     props: {
