@@ -106,6 +106,7 @@ model TestCase {
   steps          String?      @db.VarChar(255)
   data           String?      @db.VarChar(255)
   expected       String?      @db.VarChar(255)
+  result         String?      @db.VarChar(255)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
   lastExecutedAt DateTime?
