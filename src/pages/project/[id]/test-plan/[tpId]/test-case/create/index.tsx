@@ -11,12 +11,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { capitalize, replace } from "lodash";
 import { Dropdown, MenuProps } from "antd";
-import {
-  testCasePriorityOptions,
-  testCaseStatusOptions,
-  testCaseTypeOptions,
-} from "./data";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getDropdownOptionsbyType } from "@/util/data";
+import { TestPriority, TestStatus, TestType } from "@prisma/client";
 
 const CreateTestCase = (props: any) => {
   const router = useRouter();
@@ -24,6 +21,11 @@ const CreateTestCase = (props: any) => {
   const tpId = parseInt(router.query.tpId as string);
   // todo: Login session
   const userId = 1;
+  console.log(getDropdownOptionsbyType(TestType));
+
+  const testCasePriorityOptions = getDropdownOptionsbyType(TestPriority);
+  const testCaseStatusOptions = getDropdownOptionsbyType(TestStatus);
+  const testCaseTypeOptions = getDropdownOptionsbyType(TestType);
 
   const createTestCase = async (item: any) => {
     const res = await fetch("../../../../../api/test-case/create", {
