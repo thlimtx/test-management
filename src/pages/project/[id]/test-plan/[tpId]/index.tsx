@@ -120,10 +120,12 @@ const TestPlans = (props: any) => {
                         icon={faPlus}
                         onPress={onPressAddRequirement}
                       />
-                      <TextInput
-                        placeholder="Search"
-                        onChange={(text) => onSearch(`${text}`)}
-                      />
+                      <div>
+                        <TextInput
+                          placeholder="Search"
+                          onChange={(text) => onSearch(`${text}`)}
+                        />
+                      </div>
                     </div>
                     <Table
                       columns={[
@@ -162,10 +164,12 @@ const TestPlans = (props: any) => {
                         icon={faPlus}
                         onPress={onPressAddTestCase}
                       />
-                      <TextInput
-                        placeholder="Search"
-                        onChange={(text) => onSearch(`${text}`)}
-                      />
+                      <div>
+                        <TextInput
+                          placeholder="Search"
+                          onChange={(text) => onSearch(`${text}`)}
+                        />
+                      </div>
                     </div>
                     <Table
                       columns={[

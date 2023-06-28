@@ -15,14 +15,12 @@ export const TextInput = (props: TextInputProps) => {
     : {};
 
   return (
-    <div>
-      <input
-        type={type}
-        className={`border border-opacity-100 rounded-sm w-full px-3 py-1.5 my-2 text-sm ${className}`}
-        placeholder={`${placeholder}`}
-        {...registerConfig}
-        {...restProps}
-      />
-    </div>
+    <input
+      type={type}
+      className={`flex border border-opacity-100 rounded-sm w-full px-3 py-1.5 my-2 text-sm ${className}`}
+      placeholder={`${placeholder}`}
+      {...registerConfig}
+      {...restProps}
+    />
   );
 };

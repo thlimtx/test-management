@@ -85,7 +85,6 @@ const Requirements = (props: any) => {
           <p className="text-2xl font-bold italic mb-5">Requirements</p>
           <div className="p-4 my-2 bg-primaryBg shadow">
             <div className="flex flex-row justify-between items-center">
-              {/* <div> */}
               <Button
                 type="invert"
                 text="Add"
@@ -93,11 +92,12 @@ const Requirements = (props: any) => {
                 textClassName="text-textPrimary"
                 onPress={onPressAddRequirement}
               />
-              {/* </div> */}
-              <TextInput
-                placeholder="Search"
-                onChange={(text) => onSearch(`${text}`)}
-              />
+              <div>
+                <TextInput
+                  placeholder="Search"
+                  onChange={(text) => onSearch(`${text}`)}
+                />
+              </div>
             </div>
             <Table
               columns={columns}

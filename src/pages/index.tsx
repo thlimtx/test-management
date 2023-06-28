@@ -121,7 +121,6 @@ const Home = (props: any) => {
             </div>
             <p className="text-2xl font-bold italic mb-4">Projects</p>
             <div className="flex flex-row justify-between items-center">
-              {/* <div> */}
               <Button
                 type="invert"
                 text="Start a project"
@@ -129,11 +128,12 @@ const Home = (props: any) => {
                 textClassName="text-textPrimary"
                 onPress={onPressCreateProject}
               />
-              {/* </div> */}
-              <TextInput
-                placeholder="Search"
-                onChange={(text) => onSearch(`${text}`)}
-              />
+              <div>
+                <TextInput
+                  placeholder="Search"
+                  onChange={(text) => onSearch(`${text}`)}
+                />
+              </div>
             </div>
             <Table
               columns={columns}

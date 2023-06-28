@@ -109,10 +109,12 @@ const TestPlans = (props: any) => {
                 textClassName="text-textPrimary"
                 onPress={onPressAddTestPlan}
               />
-              <TextInput
-                placeholder="Search"
-                onChange={(text) => onSearch(`${text}`)}
-              />
+              <div>
+                <TextInput
+                  placeholder="Search"
+                  onChange={(text) => onSearch(`${text}`)}
+                />
+              </div>
             </div>
             <Table
               columns={columns}

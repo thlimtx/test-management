@@ -85,10 +85,12 @@ const ProjectDetails = (props: any) => {
                         icon={faPlus}
                         onPress={onPressAddMember}
                       />
-                      <TextInput
-                        placeholder="Search"
-                        onChange={(text) => onSearch(`${text}`)}
-                      />
+                      <div>
+                        <TextInput
+                          placeholder="Search"
+                          onChange={(text) => onSearch(`${text}`)}
+                        />
+                      </div>
                     </div>
                     <Table
                       columns={[
