@@ -47,11 +47,8 @@ const ProjectDetails = (props: any) => {
 
   // TODO: search
   const onSearch = (data: any) => {};
-  const onPressRemove = (data: any) => {
-    // TODO: remove member
-    console.log(data);
-  };
-  const onPressAddMember = () => {};
+  const onPressAddMember = () => router.push(router.asPath + "/members");
+
   const onSubmit = (data: any) => {
     updateProjectDetails({ id, ...data });
   };
@@ -80,10 +77,9 @@ const ProjectDetails = (props: any) => {
                     <div className="flex flex-row justify-between items-center">
                       <Button
                         type="invert"
-                        text="Add"
+                        text="Manage"
                         className="border-textPrimary"
                         textClassName="text-textPrimary"
-                        icon={faPlus}
                         onPress={onPressAddMember}
                       />
                       <div>
@@ -94,32 +90,9 @@ const ProjectDetails = (props: any) => {
                       </div>
                     </div>
                     <Table
-                      columns={[
-                        ...memberColumns,
-                        {
-                          title: "Action",
-                          key: "action",
-                          render: (_, record) => {
-                            return (
-                              userId ===
-                                find(project.members, (o) =>
-                                  includes(o.role, "OWNER")
-                                ).userId &&
-                              !includes(record.role, "OWNER") && (
-                                <FontAwesomeIcon
-                                  className="button self-center"
-                                  style={{ color: "red" }}
-                                  onClick={() => onPressRemove(record.userId)}
-                                  icon={faXmark}
-                                />
-                              )
-                            );
-                          },
-                          width: 50,
-                        },
-                      ]}
+                      columns={[...memberColumns]}
                       dataSource={project.members}
-                      rowKey={(data) => `${data.id}`}
+                      rowKey={(data) => `${data.userId}`}
                     />
                   </div>
                 );
