@@ -8,7 +8,7 @@ import {
   faPen,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import { isEmpty } from "lodash";
+import { has, isEmpty } from "lodash";
 
 export const Details = (props: DetailsProps) => {
   const {
@@ -80,14 +80,16 @@ export const Details = (props: DetailsProps) => {
           </div>
         ) : (
           <div className="flex flex-row">
-            <Button
-              text="Back"
-              className="border-textPrimary"
-              icon={faArrowLeft}
-              type="invert"
-              textClassName="text-textPrimary"
-              onPress={onPressBack}
-            />
+            {has(props, "onPressBack") && (
+              <Button
+                text="Back"
+                className="border-textPrimary"
+                icon={faArrowLeft}
+                type="invert"
+                textClassName="text-textPrimary"
+                onPress={onPressBack}
+              />
+            )}
             {editable && (
               <Button
                 text="Edit"
