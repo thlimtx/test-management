@@ -1,4 +1,4 @@
-import { DetailsProps, FieldItem } from "./props";
+import { DetailsProps, RenderDetailsProps } from "./props";
 import { TextInput } from "../TextInput";
 import { Button } from "../Button";
 import map from "lodash/map";
@@ -9,7 +9,6 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { isEmpty } from "lodash";
-import { useRouter } from "next/router";
 
 export const Details = (props: DetailsProps) => {
   const {
@@ -30,20 +29,27 @@ export const Details = (props: DetailsProps) => {
    * Render the default component for each field
    * @param item Each item in field props
    */
-  const renderDetails = (item: FieldItem) => {
-    const { title, register: curRegister, render, ...rest } = item;
+  const renderDetails = (item: RenderDetailsProps) => {
+    const { title, register: curRegister, renderText, ...rest } = item;
+    const dataValue = data[`${item.id}`];
     return (
       <div className="flex flex-1 flex-col">
         <p className="text-fade text-xs my-1.5">{title}</p>
         {editable && isEditing && item.editable !== false ? (
           <TextInput
-            defaultValue={data[`${item.id}`]}
+            defaultValue={dataValue}
             {...rest}
             register={register}
             registerOptions={curRegister}
           />
         ) : (
-          <p>{isEmpty(data[`${item.id}`]) ? "-" : data[`${item.id}`]}</p>
+          <p>
+            {renderText
+              ? renderText(dataValue)
+              : isEmpty(dataValue)
+              ? "-"
+              : dataValue}
+          </p>
         )}
       </div>
     );

@@ -1,7 +1,11 @@
 import { ReactNode } from "react";
 import { FieldValues, RegisterOptions, UseFormRegister } from "react-hook-form";
 
-export type RenderDetailsProps = {
+export type RenderDetailsProps = Omit<FieldItem, "render"> & {
+  renderText?: (text: any) => ReactNode;
+};
+
+export type RenderProps = {
   /**
    * Data from data props
    */
@@ -11,7 +15,7 @@ export type RenderDetailsProps = {
    * Render the default component for each field
    * @param item Each item in field props
    */
-  renderDetails: (item: FieldItem) => ReactNode;
+  renderDetails: (props: RenderDetailsProps) => ReactNode;
 };
 
 export type FieldItem = React.HTMLProps<HTMLInputElement> & {
@@ -24,7 +28,7 @@ export type FieldItem = React.HTMLProps<HTMLInputElement> & {
    * @param data
    * @returns
    */
-  render?: (data: RenderDetailsProps) => any;
+  render?: (data: RenderProps) => any;
   /**
    * Whether the field is editable
    */

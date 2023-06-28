@@ -1,10 +1,10 @@
-import { RenderDetailsProps } from "@/components/Details/props";
+import { RenderProps } from "@/components/Details/props";
 import { colors } from "@/util/color";
-import { get, toLower } from "lodash";
+import { capitalize, get, toLower } from "lodash";
 
 export const testCaseFields = [
   {
-    render: ({ renderDetails }: RenderDetailsProps) => {
+    render: ({ renderDetails }: RenderProps) => {
       return (
         <div className="flex flex-row">
           {renderDetails({
@@ -28,7 +28,7 @@ export const testCaseFields = [
     placeholder: "Enter Description",
   },
   {
-    render: ({ renderDetails, data }: RenderDetailsProps) => {
+    render: ({ renderDetails, data }: RenderProps) => {
       const statusColor = get(colors, toLower(data.status));
       return (
         <div className="flex flex-row">
@@ -42,17 +42,23 @@ export const testCaseFields = [
             title: "Priority",
             editable: false,
           })}
-          {renderDetails({
-            id: "status",
-            title: "Status",
-            editable: false,
-          })}
+          <div
+            className={`flex flex-1 flex-col`}
+            style={{ color: statusColor }}
+          >
+            {renderDetails({
+              id: "status",
+              title: "Status",
+              editable: false,
+              renderText: (text: any) => capitalize(text),
+            })}
+          </div>
         </div>
       );
     },
   },
   {
-    render: ({ renderDetails }: RenderDetailsProps) => {
+    render: ({ renderDetails }: RenderProps) => {
       return (
         <div className="flex flex-row justify-evenly">
           {renderDetails({
