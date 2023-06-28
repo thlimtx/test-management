@@ -48,6 +48,7 @@ const ProjectDetails = (props: any) => {
   // TODO: search
   const onSearch = (data: any) => {};
   const onPressRemove = (data: any) => {
+    // TODO: remove member
     console.log(data);
   };
   const onPressAddMember = () => {};

@@ -21,7 +21,6 @@ const CreateTestCase = (props: any) => {
   const tpId = parseInt(router.query.tpId as string);
   // todo: Login session
   const userId = 1;
-  console.log(getDropdownOptionsbyType(TestType));
 
   const testCasePriorityOptions = getDropdownOptionsbyType(TestPriority);
   const testCaseStatusOptions = getDropdownOptionsbyType(TestStatus);

@@ -43,8 +43,6 @@ export const memberColumns = [
     title: "Role",
     key: "role",
     render: (data: any) => {
-      console.log(data);
-
       return join(
         map(data.role, (o) => capitalize(o)),
         ", "
