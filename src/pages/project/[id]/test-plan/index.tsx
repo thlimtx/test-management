@@ -7,9 +7,7 @@ import { useRouter } from "next/router";
 import { prisma } from "server/db/client";
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import { get, toLower } from "lodash";
+import { capitalize, get, toLower } from "lodash";
 import { colors } from "@/util/color";
 
 const TestPlans = (props: any) => {
@@ -73,7 +71,11 @@ const TestPlans = (props: any) => {
       dataIndex: "status",
       key: "status",
       render: (value) => {
-        return <p style={{ color: get(colors, toLower(value)) }}>{value}</p>;
+        return (
+          <p style={{ color: get(colors, toLower(value)) }}>
+            {capitalize(value)}
+          </p>
+        );
       },
     },
     // TODO: handle delete

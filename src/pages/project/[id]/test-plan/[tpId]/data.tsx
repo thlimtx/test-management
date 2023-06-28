@@ -45,7 +45,11 @@ export const testCaseColumns: ColumnsType<any> = [
     dataIndex: "status",
     key: "status",
     render: (value) => {
-      return <p style={{ color: get(colors, toLower(value)) }}>{value}</p>;
+      return (
+        <p style={{ color: get(colors, toLower(value)) }}>
+          {capitalize(value)}
+        </p>
+      );
     },
   },
 ];

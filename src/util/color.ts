@@ -1,5 +1,5 @@
 export const colors = {
-  passed: "green",
+  passed: "lightgreen",
   pending: "orange",
   failed: "red",
 };
