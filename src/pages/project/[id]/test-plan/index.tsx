@@ -9,7 +9,8 @@ import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import { toLower } from "lodash";
+import { get, toLower } from "lodash";
+import { colors } from "@/util/color";
 
 const TestPlans = (props: any) => {
   const { testPlans } = props;
@@ -72,8 +73,7 @@ const TestPlans = (props: any) => {
       dataIndex: "status",
       key: "status",
       render: (value) => {
-        const color = `text-${toLower(value)}`;
-        return <p className={color}>{value}</p>;
+        return <p style={{ color: get(colors, toLower(value)) }}>{value}</p>;
       },
     },
     // TODO: handle delete

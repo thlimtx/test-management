@@ -1,5 +1,6 @@
 import { RenderDetailsProps } from "@/components/Details/props";
-import { toLower } from "lodash";
+import { colors } from "@/util/color";
+import { get, toLower } from "lodash";
 
 export const testCaseFields = [
   {
@@ -27,7 +28,8 @@ export const testCaseFields = [
     placeholder: "Enter Description",
   },
   {
-    render: ({ renderDetails }: RenderDetailsProps) => {
+    render: ({ renderDetails, data }: RenderDetailsProps) => {
+      const statusColor = get(colors, toLower(data.status));
       return (
         <div className="flex flex-row">
           {renderDetails({
@@ -50,8 +52,7 @@ export const testCaseFields = [
     },
   },
   {
-    render: ({ renderDetails, data }: RenderDetailsProps) => {
-      const statusColor = `text-${toLower(data.status)}`;
+    render: ({ renderDetails }: RenderDetailsProps) => {
       return (
         <div className="flex flex-row justify-evenly">
           {renderDetails({

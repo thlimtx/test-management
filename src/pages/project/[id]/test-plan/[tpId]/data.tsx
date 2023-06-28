@@ -1,7 +1,8 @@
 import { RenderDetailsProps } from "@/components/Details/props";
+import { colors } from "@/util/color";
 import { formatDate } from "@/util/format";
 import { ColumnsType } from "antd/es/table";
-import { toLower } from "lodash";
+import { get, toLower } from "lodash";
 
 export const requirementsColumns: ColumnsType<any> = [
   {
@@ -44,8 +45,7 @@ export const testCaseColumns: ColumnsType<any> = [
     dataIndex: "status",
     key: "status",
     render: (value) => {
-      const color = `text-${toLower(value)}`;
-      return <p className={color}>{value}</p>;
+      return <p style={{ color: get(colors, toLower(value)) }}>{value}</p>;
     },
   },
 ];
@@ -77,7 +77,7 @@ export const TestPlanFields = [
   },
   {
     render: ({ renderDetails, data }: RenderDetailsProps) => {
-      const statusColor = `text-${toLower(data.status)}`;
+      const statusColor = get(colors, toLower(data.status));
       return (
         <div className="flex flex-row justify-evenly">
           {renderDetails({
@@ -91,7 +91,10 @@ export const TestPlanFields = [
             placeholder: "Enter Last Executed Date",
             editable: false,
           })}
-          <div className={`flex flex-1 flex-col ${statusColor}`}>
+          <div
+            className={`flex flex-1 flex-col`}
+            style={{ color: statusColor }}
+          >
             {renderDetails({
               id: "status",
               title: "Status",
