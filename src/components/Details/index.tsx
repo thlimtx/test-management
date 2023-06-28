@@ -59,46 +59,47 @@ export const Details = (props: DetailsProps) => {
     <div className={`flex-1 py-3 px-5 ${className}`}>
       <div className="flex flex-row justify-between items-center mb-3">
         <p className="text-2xl font-bold italic">{title}</p>
-        {editable &&
-          (isEditing ? (
-            <div className="flex flex-row">
-              <Button
-                text="Cancel"
-                className="mr-3 border-textPrimary"
-                icon={faXmark}
-                type="invert"
-                textClassName="text-textPrimary"
-                onPress={onPressCancel}
-              />
-              <Button
-                text="Save"
-                className="border-textPrimary"
-                icon={faFloppyDisk}
-                type="invert"
-                textClassName="text-textPrimary"
-                onPress={onPressSave}
-              />
-            </div>
-          ) : (
-            <div className="flex flex-row">
-              <Button
-                text="Back"
-                className="mr-3 border-textPrimary"
-                icon={faArrowLeft}
-                type="invert"
-                textClassName="text-textPrimary"
-                onPress={onPressBack}
-              />
+        {isEditing ? (
+          <div className="flex flex-row">
+            <Button
+              text="Cancel"
+              className="mr-3 border-textPrimary"
+              icon={faXmark}
+              type="invert"
+              textClassName="text-textPrimary"
+              onPress={onPressCancel}
+            />
+            <Button
+              text="Save"
+              className="border-textPrimary"
+              icon={faFloppyDisk}
+              type="invert"
+              textClassName="text-textPrimary"
+              onPress={onPressSave}
+            />
+          </div>
+        ) : (
+          <div className="flex flex-row">
+            <Button
+              text="Back"
+              className="border-textPrimary"
+              icon={faArrowLeft}
+              type="invert"
+              textClassName="text-textPrimary"
+              onPress={onPressBack}
+            />
+            {editable && (
               <Button
                 text="Edit"
-                className="border-textPrimary"
+                className="ml-3 border-textPrimary"
                 icon={faPen}
                 type="invert"
                 textClassName="text-textPrimary"
                 onPress={onPressEdit}
               />
-            </div>
-          ))}
+            )}
+          </div>
+        )}
       </div>
       <div className="p-4 my-2 bg-primaryBg shadow">
         {map(fields, (item, index) => {
