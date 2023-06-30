@@ -1,6 +1,5 @@
 import { Button } from "@/components/Button";
 import { Screen } from "@/components/Screen";
-import { Sidebar } from "@/components/Sidebar";
 import { TextInput } from "@/components/TextInput";
 import { formatDate, jsonParse } from "@/util/format";
 import { useRouter } from "next/router";
@@ -9,6 +8,7 @@ import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { capitalize, get, toLower } from "lodash";
 import { colors } from "@/util/color";
+import { getPermission } from "@/permission/data";
 
 const TestPlans = (props: any) => {
   const { testPlans } = props;
@@ -16,6 +16,11 @@ const TestPlans = (props: any) => {
   const projectId = router.query.id;
   // todo: Login session
   const userId = 1;
+  const editPermission = getPermission({
+    action: "edit",
+    role: ["OWNER"],
+    route: "test-plan",
+  });
 
   const deleteTestPlan = async (item: any) => {
     const res = await fetch("../../api/test-plan/delete", {
@@ -97,13 +102,12 @@ const TestPlans = (props: any) => {
   ];
 
   return (
-    <Screen>
-      <div className="flex flex-1">
-        <Sidebar />
-        <div className="flex-1 py-3 px-5">
-          <p className="text-2xl font-bold italic mb-5">Test Plans</p>
-          <div className="p-4 my-2 bg-primaryBg shadow">
-            <div className="flex flex-row justify-between items-center">
+    <Screen sidebar>
+      <div className="flex-1 py-3 px-5">
+        <p className="text-2xl font-bold italic mb-5">Test Plans</p>
+        <div className="p-4 my-2 bg-primaryBg shadow">
+          <div className="flex flex-row justify-between items-center">
+            {editPermission ? (
               <Button
                 type="invert"
                 text="Add"
@@ -111,19 +115,21 @@ const TestPlans = (props: any) => {
                 textClassName="text-textPrimary"
                 onPress={onPressAddTestPlan}
               />
-              <div>
-                <TextInput
-                  placeholder="Search"
-                  onChange={(text) => onSearch(`${text}`)}
-                />
-              </div>
+            ) : (
+              <div />
+            )}
+            <div>
+              <TextInput
+                placeholder="Search"
+                onChange={(text) => onSearch(`${text}`)}
+              />
             </div>
-            <Table
-              columns={columns}
-              dataSource={testPlans}
-              rowKey={(data) => `${data.id}`}
-            />
           </div>
+          <Table
+            columns={columns}
+            dataSource={testPlans}
+            rowKey={(data) => `${data.id}`}
+          />
         </div>
       </div>
     </Screen>

@@ -1,6 +1,5 @@
 import { Details } from "@/components/Details";
 import { Screen } from "@/components/Screen";
-import { Sidebar } from "@/components/Sidebar";
 import { formatDate, jsonParse } from "@/util/format";
 import { replace } from "lodash";
 import { useRouter } from "next/router";
@@ -8,6 +7,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { prisma } from "server/db/client";
 import { testCaseFields } from "./data";
+import { getPermission } from "@/permission/data";
 
 const TestCase = (props: any) => {
   const { testCase } = props;
@@ -21,6 +21,11 @@ const TestCase = (props: any) => {
   const { id, testPlanId } = data;
   // todo: Login session
   const userId = 1;
+  const editPermission = getPermission({
+    action: "edit",
+    role: ["OWNER"],
+    route: "test-case",
+  });
   const [isEditing, setIsEditing] = useState(false);
   const { register, handleSubmit } = useForm();
 
@@ -49,22 +54,19 @@ const TestCase = (props: any) => {
   };
 
   return (
-    <Screen>
-      <div className="flex flex-1">
-        <Sidebar />
-        <Details
-          isEditing={isEditing}
-          editable
-          register={register}
-          title="Test Case"
-          onPressBack={onPressBack}
-          onPressCancel={onPressCancel}
-          onPressEdit={onPressEdit}
-          onPressSave={handleSubmit(onSubmit)}
-          data={data}
-          fields={[...testCaseFields]}
-        />
-      </div>
+    <Screen sidebar>
+      <Details
+        isEditing={isEditing}
+        editable={editPermission}
+        register={register}
+        title="Test Case"
+        onPressBack={onPressBack}
+        onPressCancel={onPressCancel}
+        onPressEdit={onPressEdit}
+        onPressSave={handleSubmit(onSubmit)}
+        data={data}
+        fields={[...testCaseFields]}
+      />
     </Screen>
   );
 };

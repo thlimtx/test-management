@@ -1,6 +1,5 @@
 import { Button } from "@/components/Button";
 import { Screen } from "@/components/Screen";
-import { Sidebar } from "@/components/Sidebar";
 import { TextInput } from "@/components/TextInput";
 import { jsonParse } from "@/util/format";
 import { useRouter } from "next/router";
@@ -9,6 +8,7 @@ import { Checkbox, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { find } from "lodash";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { getPermission } from "@/permission/data";
 
 const SelectRequirements = (props: any) => {
   const { requirements } = props;
@@ -17,6 +17,11 @@ const SelectRequirements = (props: any) => {
 
   // todo: Login session
   const userId = 1;
+  const editPermission = getPermission({
+    action: "edit",
+    role: ["OWNER"],
+    route: "test-plan",
+  });
 
   const updateReference = async (item: any) => {
     const res = await fetch("../../../../api/reference/update", {
@@ -79,38 +84,35 @@ const SelectRequirements = (props: any) => {
   ];
 
   return (
-    <Screen>
-      <div className="flex flex-1">
-        <Sidebar />
-        <div className="flex-1 py-3 px-5">
-          <div className="flex flex-row justify-between items-center mb-3">
-            <p className="text-2xl font-bold italic">Select Requirements</p>
+    <Screen sidebar permission={editPermission}>
+      <div className="flex-1 py-3 px-5">
+        <div className="flex flex-row justify-between items-center mb-3">
+          <p className="text-2xl font-bold italic">Select Requirements</p>
 
-            <Button
-              text="Back"
-              className="mr-3 border-textPrimary"
-              icon={faArrowLeft}
-              type="invert"
-              textClassName="text-textPrimary"
-              onPress={onPressBack}
-            />
-          </div>
-          <div className="p-4 my-2 bg-primaryBg shadow">
-            <div className="flex flex-row justify-between items-center">
-              <div />
-              <div>
-                <TextInput
-                  placeholder="Search"
-                  onChange={(text) => onSearch(`${text}`)}
-                />
-              </div>
+          <Button
+            text="Back"
+            className="mr-3 border-textPrimary"
+            icon={faArrowLeft}
+            type="invert"
+            textClassName="text-textPrimary"
+            onPress={onPressBack}
+          />
+        </div>
+        <div className="p-4 my-2 bg-primaryBg shadow">
+          <div className="flex flex-row justify-between items-center">
+            <div />
+            <div>
+              <TextInput
+                placeholder="Search"
+                onChange={(text) => onSearch(`${text}`)}
+              />
             </div>
-            <Table
-              columns={columns}
-              dataSource={requirements}
-              rowKey={(data) => `${data.id}`}
-            />
           </div>
+          <Table
+            columns={columns}
+            dataSource={requirements}
+            rowKey={(data) => `${data.id}`}
+          />
         </div>
       </div>
     </Screen>

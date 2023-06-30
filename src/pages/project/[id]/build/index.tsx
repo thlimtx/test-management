@@ -1,5 +1,4 @@
 import { Screen } from "@/components/Screen";
-import { Sidebar } from "@/components/Sidebar";
 import { jsonParse } from "@/util/format";
 import { useRouter } from "next/router";
 import { prisma } from "server/db/client";
@@ -8,13 +7,21 @@ import { Details } from "@/components/Details";
 import { useForm } from "react-hook-form";
 import { buildFields, buildLogColumns } from "./data";
 import { useState } from "react";
+import { getPermission } from "@/permission/data";
 
-const Dashboard = (props: any) => {
+const Build = (props: any) => {
   const { build, buildLog } = props;
   const { id } = build;
 
   const router = useRouter();
   const { register, handleSubmit } = useForm();
+
+  // TODO: login session
+  const editPermission = getPermission({
+    action: "edit",
+    role: ["OWNER"],
+    route: "build",
+  });
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -39,38 +46,35 @@ const Dashboard = (props: any) => {
   };
 
   return (
-    <Screen>
-      <div className="flex flex-1">
-        <Sidebar />
-        <Details
-          isEditing={isEditing}
-          editable
-          register={register}
-          title="Build"
-          onPressCancel={onPressCancel}
-          onPressEdit={onPressEdit}
-          onPressSave={handleSubmit(onSubmit)}
-          data={build}
-          fields={[
-            ...buildFields,
-            {
-              render: ({}) => {
-                return (
-                  <div className="">
-                    <p className="text-lg font-bold my-3">Build Log</p>
+    <Screen sidebar>
+      <Details
+        isEditing={isEditing}
+        editable={editPermission}
+        register={register}
+        title="Build"
+        onPressCancel={onPressCancel}
+        onPressEdit={onPressEdit}
+        onPressSave={handleSubmit(onSubmit)}
+        data={build}
+        fields={[
+          ...buildFields,
+          {
+            render: ({}) => {
+              return (
+                <div className="">
+                  <p className="text-lg font-bold my-3">Build Log</p>
 
-                    <Table
-                      columns={[...buildLogColumns]}
-                      dataSource={buildLog}
-                      rowKey={(data) => `${data.userId}`}
-                    />
-                  </div>
-                );
-              },
+                  <Table
+                    columns={[...buildLogColumns]}
+                    dataSource={buildLog}
+                    rowKey={(data) => `${data.userId}`}
+                  />
+                </div>
+              );
             },
-          ]}
-        />
-      </div>
+          },
+        ]}
+      />
     </Screen>
   );
 };
@@ -93,4 +97,4 @@ export const getServerSideProps = async (context: any) => {
   };
 };
 
-export default Dashboard;
+export default Build;

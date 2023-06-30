@@ -1,6 +1,5 @@
 import { Details } from "@/components/Details";
 import { Screen } from "@/components/Screen";
-import { Sidebar } from "@/components/Sidebar";
 import { jsonParse } from "@/util/format";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -19,6 +18,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { capitalize, find, includes, isNull } from "lodash";
 import { Role, User } from "@prisma/client";
 import { getDropdownOptionsbyType } from "@/util/data";
+import { getPermission } from "@/permission/data";
 
 const Members = (props: any) => {
   // TODO: manage roles
@@ -29,6 +29,11 @@ const Members = (props: any) => {
 
   // todo: Login session
   const userId = 1;
+  const editPermission = getPermission({
+    action: "edit",
+    role: ["OWNER"],
+    route: "members",
+  });
   const roleOptions = getDropdownOptionsbyType(Role, [Role.OWNER]);
   const [foundUser, setFoundUser] = useState<User | null>();
   const [userSearch, setUserSearch] = useState<string>();
@@ -93,137 +98,134 @@ const Members = (props: any) => {
   };
 
   return (
-    <Screen>
-      <div className="flex flex-1">
-        <Sidebar />
-        <Details
-          editable={false}
-          title="Project Members"
-          onPressBack={onPressBack}
-          fields={[
-            {
-              render: ({}) => {
-                return (
-                  <div className="">
-                    <p className="text-lg font-bold my-3"></p>
-                    <div className="flex flex-row justify-between items-center">
-                      <TextInput
-                        placeholder="Enter user email"
-                        onChange={(text) =>
-                          onSearch(`${text.currentTarget.value}`)
-                        }
-                      />
-                      <Button
-                        type="invert"
-                        text="Find"
-                        className="border-textPrimary ml-3"
-                        textClassName="text-textPrimary"
-                        icon={faSearch}
-                        onPress={onPressFind}
-                      />
-                    </div>
-                    {foundUser ? (
-                      <div className="flex flex-row items-center">
-                        <div className="flex flex-col flex-1">
-                          <p className="text-xs text-fade">Name</p>
-                          <p>{foundUser?.name}</p>
-                        </div>
-                        <div className="flex flex-col flex-1 mx-2">
-                          <p className="text-xs text-fade">Email</p>
-                          <p>{foundUser?.email}</p>
-                        </div>
-                        <Dropdown
-                          menu={{ items: roleOptions, onClick: onSelectRole }}
-                          trigger={["click"]}
-                        >
-                          <a onClick={(e) => e.preventDefault()}>
-                            <div
-                              id="type"
-                              className={`flex flex-row items-center border border-opacity-100 rounded-sm w-full px-3 py-1.5 my-2 text-sm button`}
-                            >
-                              <input
-                                className="flex flex-1 button"
-                                placeholder="Select Type"
-                                value={capitalize(selectedRole)}
-                                disabled
-                              />
-                              <FontAwesomeIcon icon={faChevronDown} />
-                            </div>
-                          </a>
-                        </Dropdown>
-                        <Button
-                          type="invert"
-                          text="Add"
-                          className="border-textPrimary ml-3"
-                          textClassName="text-textPrimary"
-                          icon={faPlus}
-                          onPress={onPressAddMember}
-                        />
-                      </div>
-                    ) : (
-                      <div
-                        className="text-center items-center p-5"
-                        style={{ backgroundColor: "#EFEFEF" }}
-                      >
-                        <p style={{ color: "gray" }}>
-                          {isNull(foundUser)
-                            ? "No user with email found"
-                            : "Search user by their email and add to project as members"}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                );
-              },
-            },
-            {
-              render: ({}) => {
-                return (
-                  <div className="">
-                    <p className="text-lg font-bold my-3">All Members</p>
-                    <div className="flex flex-row justify-between items-center">
-                      <div></div>
-                      <div>
-                        <TextInput
-                          placeholder="Search"
-                          onChange={(text) => onSearch(`${text}`)}
-                        />
-                      </div>
-                    </div>
-                    <Table
-                      columns={[
-                        ...memberColumns,
-                        {
-                          title: "Action",
-                          key: "action",
-                          render: (_, record) => {
-                            return (
-                              userId ===
-                                find(members, (o) => includes(o.role, "OWNER"))
-                                  .userId &&
-                              !includes(record.role, "OWNER") && (
-                                <FontAwesomeIcon
-                                  className="button self-center"
-                                  style={{ color: "red" }}
-                                  onClick={() => onPressRemove(record.userId)}
-                                  icon={faXmark}
-                                />
-                              )
-                            );
-                          },
-                          width: 50,
-                        },
-                      ]}
-                      dataSource={members}
-                      rowKey={(data) => `${data.userId}`}
+    <Screen sidebar permission={editPermission}>
+      <Details
+        editable={false}
+        title="Project Members"
+        onPressBack={onPressBack}
+        fields={[
+          {
+            render: ({}) => {
+              return (
+                <div className="">
+                  <p className="text-lg font-bold my-3"></p>
+                  <div className="flex flex-row justify-between items-center">
+                    <TextInput
+                      placeholder="Enter user email"
+                      onChange={(text) =>
+                        onSearch(`${text.currentTarget.value}`)
+                      }
+                    />
+                    <Button
+                      type="invert"
+                      text="Find"
+                      className="border-textPrimary ml-3"
+                      textClassName="text-textPrimary"
+                      icon={faSearch}
+                      onPress={onPressFind}
                     />
                   </div>
-                );
-              },
+                  {foundUser ? (
+                    <div className="flex flex-row items-center">
+                      <div className="flex flex-col flex-1">
+                        <p className="text-xs text-fade">Name</p>
+                        <p>{foundUser?.name}</p>
+                      </div>
+                      <div className="flex flex-col flex-1 mx-2">
+                        <p className="text-xs text-fade">Email</p>
+                        <p>{foundUser?.email}</p>
+                      </div>
+                      <Dropdown
+                        menu={{ items: roleOptions, onClick: onSelectRole }}
+                        trigger={["click"]}
+                      >
+                        <a onClick={(e) => e.preventDefault()}>
+                          <div
+                            id="type"
+                            className={`flex flex-row items-center border border-opacity-100 rounded-sm w-full px-3 py-1.5 my-2 text-sm button`}
+                          >
+                            <input
+                              className="flex flex-1 button"
+                              placeholder="Select Type"
+                              value={capitalize(selectedRole)}
+                              disabled
+                            />
+                            <FontAwesomeIcon icon={faChevronDown} />
+                          </div>
+                        </a>
+                      </Dropdown>
+                      <Button
+                        type="invert"
+                        text="Add"
+                        className="border-textPrimary ml-3"
+                        textClassName="text-textPrimary"
+                        icon={faPlus}
+                        onPress={onPressAddMember}
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="text-center items-center p-5"
+                      style={{ backgroundColor: "#EFEFEF" }}
+                    >
+                      <p style={{ color: "gray" }}>
+                        {isNull(foundUser)
+                          ? "No user with email found"
+                          : "Search user by their email and add to project as members"}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
             },
-          ]}
-        />
-      </div>
+          },
+          {
+            render: ({}) => {
+              return (
+                <div className="">
+                  <p className="text-lg font-bold my-3">All Members</p>
+                  <div className="flex flex-row justify-between items-center">
+                    <div></div>
+                    <div>
+                      <TextInput
+                        placeholder="Search"
+                        onChange={(text) => onSearch(`${text}`)}
+                      />
+                    </div>
+                  </div>
+                  <Table
+                    columns={[
+                      ...memberColumns,
+                      {
+                        title: "Action",
+                        key: "action",
+                        render: (_, record) => {
+                          return (
+                            userId ===
+                              find(members, (o) => includes(o.role, "OWNER"))
+                                .userId &&
+                            !includes(record.role, "OWNER") && (
+                              <FontAwesomeIcon
+                                className="button self-center"
+                                style={{ color: "red" }}
+                                onClick={() => onPressRemove(record.userId)}
+                                icon={faXmark}
+                              />
+                            )
+                          );
+                        },
+                        width: 50,
+                      },
+                    ]}
+                    dataSource={members}
+                    rowKey={(data) => `${data.userId}`}
+                  />
+                </div>
+              );
+            },
+          },
+        ]}
+      />
     </Screen>
   );
 };

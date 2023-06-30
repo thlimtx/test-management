@@ -1,7 +1,6 @@
 import { Button } from "@/components/Button";
 import { Details } from "@/components/Details";
 import { Screen } from "@/components/Screen";
-import { Sidebar } from "@/components/Sidebar";
 import { TextInput } from "@/components/TextInput";
 import { formatDate, jsonParse } from "@/util/format";
 import { faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -14,6 +13,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { prisma } from "server/db/client";
 import { TestPlanFields, requirementsColumns, testCaseColumns } from "./data";
+import { getPermission } from "@/permission/data";
 
 const TestPlans = (props: any) => {
   const { testPlan } = props;
@@ -27,9 +27,15 @@ const TestPlans = (props: any) => {
   const { projectId, id, reference, testCase } = data;
   // todo: Login session
   const userId = 1;
+  const editPermission = getPermission({
+    action: "edit",
+    role: ["OWNER"],
+    route: "test-plan",
+  });
   const [isEditing, setIsEditing] = useState(false);
   const { register, handleSubmit } = useForm();
 
+  // TODO: delete test case
   const updateTestPlan = async (item: any) => {
     const res = await fetch("../../../api/test-plan/update", {
       method: "POST",
@@ -73,45 +79,46 @@ const TestPlans = (props: any) => {
 
   const columns: ColumnsType<any> = [
     ...requirementsColumns,
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => {
-        return (
-          <FontAwesomeIcon
-            className="button self-center"
-            style={{ color: "red" }}
-            onClick={() => onPressRemove(record.id)}
-            icon={faXmark}
-          />
-        );
-      },
-      width: 50,
-    },
+    editPermission
+      ? {
+          title: "Action",
+          key: "action",
+          render: (_, record) => {
+            return (
+              <FontAwesomeIcon
+                className="button self-center"
+                style={{ color: "red" }}
+                onClick={() => onPressRemove(record.id)}
+                icon={faXmark}
+              />
+            );
+          },
+          width: 50,
+        }
+      : {},
   ];
 
   return (
-    <Screen>
-      <div className="flex flex-1">
-        <Sidebar />
-        <Details
-          isEditing={isEditing}
-          editable
-          register={register}
-          title="Test Plans"
-          onPressBack={onPressBack}
-          onPressCancel={onPressCancel}
-          onPressEdit={onPressEdit}
-          onPressSave={handleSubmit(onSubmit)}
-          data={data}
-          fields={[
-            ...TestPlanFields,
-            {
-              render: ({}) => {
-                return (
-                  <div className="">
-                    <p className="text-lg font-bold my-3">Requirements</p>
-                    <div className="flex flex-row justify-between items-center">
+    <Screen sidebar>
+      <Details
+        isEditing={isEditing}
+        editable={editPermission}
+        register={register}
+        title="Test Plans"
+        onPressBack={onPressBack}
+        onPressCancel={onPressCancel}
+        onPressEdit={onPressEdit}
+        onPressSave={handleSubmit(onSubmit)}
+        data={data}
+        fields={[
+          ...TestPlanFields,
+          {
+            render: ({}) => {
+              return (
+                <div className="">
+                  <p className="text-lg font-bold my-3">Requirements</p>
+                  <div className="flex flex-row justify-between items-center">
+                    {editPermission ? (
                       <Button
                         type="invert"
                         text="Add"
@@ -120,42 +127,46 @@ const TestPlans = (props: any) => {
                         icon={faPlus}
                         onPress={onPressAddRequirement}
                       />
-                      <div>
-                        <TextInput
-                          placeholder="Search"
-                          onChange={(text) => onSearch(`${text}`)}
-                        />
-                      </div>
+                    ) : (
+                      <div />
+                    )}
+                    <div>
+                      <TextInput
+                        placeholder="Search"
+                        onChange={(text) => onSearch(`${text}`)}
+                      />
                     </div>
-                    <Table
-                      columns={[
-                        {
-                          title: "Code",
-                          key: "reqCode",
-                          width: 50,
-                          render: (value) => (
-                            <a
-                              href={`/project/${projectId}/requirement/${value.id}`}
-                            >
-                              {value.reqCode}
-                            </a>
-                          ),
-                        },
-                        ...columns,
-                      ]}
-                      dataSource={map(reference, (item) => item.req)}
-                      rowKey={(data) => `${data.id}`}
-                    />
                   </div>
-                );
-              },
+                  <Table
+                    columns={[
+                      {
+                        title: "Code",
+                        key: "reqCode",
+                        width: 50,
+                        render: (value) => (
+                          <a
+                            href={`/project/${projectId}/requirement/${value.id}`}
+                          >
+                            {value.reqCode}
+                          </a>
+                        ),
+                      },
+                      ...columns,
+                    ]}
+                    dataSource={map(reference, (item) => item.req)}
+                    rowKey={(data) => `${data.id}`}
+                  />
+                </div>
+              );
             },
-            {
-              render: ({}) => {
-                return (
-                  <div className="">
-                    <p className="text-lg font-bold my-3">Test Case</p>
-                    <div className="flex flex-row justify-between items-center">
+          },
+          {
+            render: ({}) => {
+              return (
+                <div className="">
+                  <p className="text-lg font-bold my-3">Test Case</p>
+                  <div className="flex flex-row justify-between items-center">
+                    {editPermission ? (
                       <Button
                         type="invert"
                         text="Add"
@@ -164,39 +175,41 @@ const TestPlans = (props: any) => {
                         icon={faPlus}
                         onPress={onPressAddTestCase}
                       />
-                      <div>
-                        <TextInput
-                          placeholder="Search"
-                          onChange={(text) => onSearch(`${text}`)}
-                        />
-                      </div>
+                    ) : (
+                      <div />
+                    )}
+                    <div>
+                      <TextInput
+                        placeholder="Search"
+                        onChange={(text) => onSearch(`${text}`)}
+                      />
                     </div>
-                    <Table
-                      columns={[
-                        {
-                          title: "Code",
-                          key: "testCaseCode",
-                          width: 50,
-                          render: (value) => (
-                            <a
-                              href={`/project/${projectId}/test-plan/${id}/test-case/${value.id}`}
-                            >
-                              {value.testCaseCode}
-                            </a>
-                          ),
-                        },
-                        ...testCaseColumns,
-                      ]}
-                      dataSource={testCase}
-                      rowKey={(data) => `${data.id}`}
-                    />
                   </div>
-                );
-              },
+                  <Table
+                    columns={[
+                      {
+                        title: "Code",
+                        key: "testCaseCode",
+                        width: 50,
+                        render: (value) => (
+                          <a
+                            href={`/project/${projectId}/test-plan/${id}/test-case/${value.id}`}
+                          >
+                            {value.testCaseCode}
+                          </a>
+                        ),
+                      },
+                      ...testCaseColumns,
+                    ]}
+                    dataSource={testCase}
+                    rowKey={(data) => `${data.id}`}
+                  />
+                </div>
+              );
             },
-          ]}
-        />
-      </div>
+          },
+        ]}
+      />
     </Screen>
   );
 };

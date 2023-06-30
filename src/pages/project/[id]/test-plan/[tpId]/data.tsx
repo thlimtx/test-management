@@ -6,12 +6,6 @@ import { capitalize, get, toLower } from "lodash";
 
 export const requirementsColumns: ColumnsType<any> = [
   {
-    title: "Code",
-    key: "reqCode",
-    dataIndex: "reqCode",
-    width: 50,
-  },
-  {
     title: "Title",
     dataIndex: "title",
     key: "title",
