@@ -5,7 +5,7 @@ import { Header } from "@/components/Header";
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <div>
-      <Header />
+      <Header className="z-50" />
       <Component {...pageProps} />
     </div>
   );

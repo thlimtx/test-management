@@ -34,30 +34,34 @@ export const Sidebar = (props: any) => {
     );
   };
   return (
-    <div className="sidebar bg-primaryBg justify-between flex flex-col">
-      <div>
-        {map(sidebarContent, (item, index) => {
-          const currentPage = words(router.asPath);
-          const isCurrentPage = includes(currentPage, item.id);
-          return (
-            <div
-              key={index}
-              className={`sidebar-item ${isCurrentPage ? "text-primary" : ""}`}
-              onClick={() =>
-                router.push("/project/" + router.query.id + "/" + item.id)
-              }
-            >
-              {renderSidebarItem(item)}
-            </div>
-          );
-        })}
-      </div>
-      <div className="sidebar-exit" onClick={() => router.push("/")}>
-        {renderSidebarItem({
-          id: "exit",
-          name: "Exit",
-          icon: faRightToBracket,
-        })}
+    <div className="sidebar-frame">
+      <div className="sidebar bg-primaryBg justify-between flex flex-col">
+        <div>
+          {map(sidebarContent, (item, index) => {
+            const currentPage = words(router.asPath);
+            const isCurrentPage = includes(currentPage, item.id);
+            return (
+              <div
+                key={index}
+                className={`sidebar-item ${
+                  isCurrentPage ? "text-primary" : ""
+                }`}
+                onClick={() =>
+                  router.push("/project/" + router.query.id + "/" + item.id)
+                }
+              >
+                {renderSidebarItem(item)}
+              </div>
+            );
+          })}
+        </div>
+        <div className="sidebar-exit" onClick={() => router.push("/")}>
+          {renderSidebarItem({
+            id: "exit",
+            name: "Exit",
+            icon: faRightToBracket,
+          })}
+        </div>
       </div>
     </div>
   );

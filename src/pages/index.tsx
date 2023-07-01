@@ -82,6 +82,20 @@ const Home = (props: any) => {
     <Screen>
       {hasProject ? (
         <div className="flex flex-1">
+          {/** SIDEBAR */}
+          <div className="sidebar-frame">
+            <div className="sidebar bg-primaryBg p-5">
+              <div className="flex flex-row justify-between my-2">
+                <p className="font-bold">Projects Owned</p>
+                <p>{size(projectsOwned)}</p>
+              </div>
+              <div className="flex flex-row justify-between my-2">
+                <p className="font-bold">Total Projects</p>
+                <p>{size(projects)}</p>
+              </div>
+            </div>
+          </div>
+
           <div className="maincontent flex-1 py-5 px-10">
             <p className="text-2xl font-bold italic mb-5">Recent Changes</p>
             <div className="flex flex-row flex-wrap">
@@ -140,18 +154,6 @@ const Home = (props: any) => {
               dataSource={projects}
               rowKey={(data) => `${data.id}`}
             />
-          </div>
-
-          {/** SIDEBAR */}
-          <div className="sidebar bg-primaryBg p-5">
-            <div className="flex flex-row justify-between my-2">
-              <p className="font-bold">Projects Owned</p>
-              <p>{size(projectsOwned)}</p>
-            </div>
-            <div className="flex flex-row justify-between my-2">
-              <p className="font-bold">Total Projects</p>
-              <p>{size(projects)}</p>
-            </div>
           </div>
         </div>
       ) : (
