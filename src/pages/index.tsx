@@ -9,6 +9,7 @@ import {
   filter,
   find,
   isEmpty,
+  join,
   map,
   size,
   some,
@@ -21,43 +22,6 @@ import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import moment from "moment";
 
-const columns: ColumnsType<any> = [
-  {
-    title: "Name",
-    dataIndex: "name",
-    key: "name",
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "Version",
-    dataIndex: "version",
-    key: "version",
-  },
-  {
-    title: "Tools",
-    dataIndex: "tools",
-    key: "tools",
-  },
-  {
-    title: "Role",
-    dataIndex: "role",
-    key: "role",
-  },
-  {
-    title: "Members",
-    key: "member",
-    render: (item) => {
-      return size(item.members);
-    },
-  },
-  {
-    title: "Last Updated",
-    dataIndex: "updatedAt",
-    key: "updatedAt",
-    render: (item) => moment(item).format("DD/MM/YYYY"),
-  },
-];
-
 const Home = (props: any) => {
   const userId = 1;
   const router = useRouter();
@@ -66,6 +30,51 @@ const Home = (props: any) => {
   const projectsOwned = filter(projects, (item) =>
     some(item.members, { userId, role: ["OWNER"] })
   );
+
+  const columns: ColumnsType<any> = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: "Version",
+      dataIndex: "version",
+      key: "version",
+    },
+    {
+      title: "Tools",
+      dataIndex: "tools",
+      key: "tools",
+    },
+    {
+      title: "Role",
+      key: "role",
+      render: (data: any) => {
+        const curUser = find(data.members, (o) => {
+          return o.userId === userId;
+        });
+        return join(
+          map(curUser.role, (o) => capitalize(o)),
+          ", "
+        );
+      },
+    },
+    {
+      title: "Members",
+      key: "members",
+      render: (item) => {
+        return size(item.members);
+      },
+    },
+    {
+      title: "Last Updated",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      render: (item) => moment(item).format("DD/MM/YYYY"),
+    },
+  ];
 
   // todo: search
   const onSearch = (search: string) => {};
