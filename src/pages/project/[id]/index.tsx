@@ -9,7 +9,11 @@ const Project = () => {
   });
   // todo: Login session
   const userId = 1;
-  return <Screen></Screen>;
+  return (
+    <Screen>
+      <div />
+    </Screen>
+  );
 };
 
 export default Project;
