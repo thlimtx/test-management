@@ -1,4 +1,4 @@
-import { capitalize, filter, includes, map } from "lodash";
+import { capitalize, filter, includes, map, mapValues } from "lodash";
 
 /**
  * Get dropdown option data type from enum
@@ -15,4 +15,11 @@ export const getDropdownOptionsbyType = (type: any, omit?: string[]) => {
       };
     }
   );
+};
+
+export const getFilter = (data: any) => {
+  const filter = mapValues(data, (item) => {
+    return { contains: item, mode: "insensitive" };
+  });
+  return filter;
 };

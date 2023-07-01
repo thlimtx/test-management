@@ -6,6 +6,7 @@ import { Box } from "@/components/Box";
 import { useRouter } from "next/router";
 import {
   capitalize,
+  debounce,
   filter,
   find,
   isEmpty,
@@ -13,7 +14,6 @@ import {
   map,
   size,
   some,
-  sortBy,
 } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
@@ -21,15 +21,24 @@ import { TextInput } from "@/components/TextInput";
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import moment from "moment";
+import { useEffect, useState } from "react";
+import { Member, Project } from "@prisma/client";
 
 const Home = (props: any) => {
   const userId = 1;
   const router = useRouter();
-  const { projects } = props;
-  const hasProject = !isEmpty(projects);
-  const projectsOwned = filter(projects, (item) =>
+  const { recentProjects, allProjects } = props;
+  const [projects, setProjects] =
+    useState<(Project & { members: Member[] })[]>(allProjects);
+
+  const hasProject = !isEmpty(allProjects);
+  const projectsOwned = filter(allProjects, (item) =>
     some(item.members, { userId, role: ["OWNER"] })
   );
+
+  useEffect(() => {
+    getProjects({});
+  }, []);
 
   const columns: ColumnsType<any> = [
     {
@@ -76,8 +85,22 @@ const Home = (props: any) => {
     },
   ];
 
+  const getProjects = async (item: any) => {
+    const res = await fetch("/api/project/filter", {
+      method: "POST",
+      body: JSON.stringify({ userId, ...item }),
+    });
+    if (res.ok) {
+      setProjects(await res.json());
+    } else {
+      alert("Failed to get projects");
+    }
+  };
+
   // todo: search
-  const onSearch = (search: string) => {};
+  const onSearch = debounce((text) => {
+    getProjects({ name: text });
+  }, 150);
 
   const onPressCreateProject = () => {
     router.push("/project/create");
@@ -100,7 +123,7 @@ const Home = (props: any) => {
               </div>
               <div className="flex flex-row justify-between my-2">
                 <p className="font-bold">Total Projects</p>
-                <p>{size(projects)}</p>
+                <p>{size(allProjects)}</p>
               </div>
             </div>
           </div>
@@ -108,7 +131,7 @@ const Home = (props: any) => {
           <div className="maincontent flex-1 py-5 px-10">
             <p className="text-2xl font-bold italic mb-5">Recent Changes</p>
             <div className="flex flex-row flex-wrap">
-              {map(sortBy(projects, [(o) => o.updatedAt]), (item, index) => {
+              {map(recentProjects, (item, index) => {
                 return (
                   <div
                     key={index}
@@ -154,7 +177,7 @@ const Home = (props: any) => {
               <div>
                 <TextInput
                   placeholder="Search"
-                  onChange={(text) => onSearch(`${text}`)}
+                  onChange={(e) => onSearch(e.currentTarget.value)}
                 />
               </div>
             </div>
@@ -188,15 +211,25 @@ const Home = (props: any) => {
 
 export const getServerSideProps = async (context: any) => {
   const userId = 1;
+  const recentProjects = await prisma.project.findMany({
+    where: { members: { some: { userId } } },
+    include: {
+      members: true,
+    },
+    orderBy: { updatedAt: "desc" },
+    take: 4,
+  });
   const projects = await prisma.project.findMany({
     where: { members: { some: { userId } } },
     include: {
       members: true,
     },
+    orderBy: { updatedAt: "desc" },
   });
   return {
     props: {
-      projects: jsonParse(projects),
+      recentProjects: jsonParse(recentProjects),
+      allProjects: jsonParse(projects),
     },
   };
 };
