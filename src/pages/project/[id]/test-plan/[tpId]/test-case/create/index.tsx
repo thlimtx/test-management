@@ -3,17 +3,13 @@ import { Screen } from "@/components/Screen";
 import { TextInput } from "@/components/TextInput";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
-import {
-  faChevronDown,
-  faFloppyDisk,
-  faXmark,
-} from "@fortawesome/free-solid-svg-icons";
-import { capitalize, replace } from "lodash";
-import { Dropdown, MenuProps } from "antd";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFloppyDisk, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { replace } from "lodash";
+import { MenuProps } from "antd";
 import { getDropdownOptionsbyType } from "@/util/data";
 import { TestPriority, TestStatus, TestType } from "@prisma/client";
 import { getPermission } from "@/permission/data";
+import { FormDropdown } from "@/components/FormDropdown";
 
 const CreateTestCase = (props: any) => {
   const router = useRouter();
@@ -66,34 +62,10 @@ const CreateTestCase = (props: any) => {
     title: string,
     options: MenuProps["items"]
   ) => {
-    const onSelect: MenuProps["onClick"] = ({ key }) => setValue(id, key);
+    const value = watch(id);
+    const onSelect = (key: string, value?: string) => setValue(key, value);
     return (
-      <div>
-        <p className="text-fade text-xs">{title}</p>
-        <Dropdown
-          menu={{
-            items: options,
-            onClick: onSelect,
-          }}
-          trigger={["click"]}
-        >
-          <a onClick={(e) => e.preventDefault()}>
-            <div
-              id={id}
-              className={`flex flex-row items-center border border-opacity-100 rounded-sm w-full px-3 py-1.5 my-2 text-sm button`}
-            >
-              <input
-                className="flex flex-1 button bg-primaryBg"
-                {...register(id)}
-                placeholder={`Select ${title}`}
-                value={capitalize(watch(id))}
-                disabled
-              />
-              <FontAwesomeIcon icon={faChevronDown} />
-            </div>
-          </a>
-        </Dropdown>
-      </div>
+      <FormDropdown {...{ register, id, title, options, value, onSelect }} />
     );
   };
 

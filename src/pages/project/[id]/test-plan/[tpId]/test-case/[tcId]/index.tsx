@@ -10,9 +10,7 @@ import { testCaseDropFields, testCaseFields1, testCaseFields2 } from "./data";
 import { getPermission } from "@/permission/data";
 import { RenderProps } from "@/components/Details/props";
 import { colors } from "@/util/color";
-import { Dropdown, MenuProps } from "antd";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import { FormDropdown } from "@/components/FormDropdown";
 
 const TestCase = (props: any) => {
   const { testCase } = props;
@@ -23,7 +21,7 @@ const TestCase = (props: any) => {
 
   const router = useRouter();
 
-  const { id, testPlanId } = data;
+  const { id } = data;
   // todo: Login session
   const userId = 1;
   const editPermission = getPermission({
@@ -65,32 +63,13 @@ const TestCase = (props: any) => {
           <div className="flex flex-row justify-between">
             {map(testCaseDropFields, (item) => {
               const { id, title, options } = item;
-              const onSelect: MenuProps["onClick"] = ({ key }) =>
-                setValue(id, key);
+              const value = watch(id);
+              const onSelect = (key: string, value?: string) =>
+                setValue(key, value);
               return (
-                <Dropdown
-                  menu={{
-                    items: options,
-                    onClick: onSelect,
-                  }}
-                  trigger={["click"]}
-                >
-                  <a onClick={(e) => e.preventDefault()}>
-                    <div
-                      id={id}
-                      className={`flex flex-row items-center border border-opacity-100 rounded-sm w-full px-3 py-1.5 my-2 text-sm button`}
-                    >
-                      <input
-                        className="flex flex-1 button bg-primaryBg"
-                        {...register(id)}
-                        placeholder={`Select ${title}`}
-                        value={capitalize(watch(id))}
-                        disabled
-                      />
-                      <FontAwesomeIcon icon={faChevronDown} />
-                    </div>
-                  </a>
-                </Dropdown>
+                <FormDropdown
+                  {...{ register, id, title, options, value, onSelect }}
+                />
               );
             })}
           </div>
