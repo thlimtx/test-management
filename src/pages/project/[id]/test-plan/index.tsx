@@ -6,14 +6,16 @@ import { useRouter } from "next/router";
 import { prisma } from "server/db/client";
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { capitalize, get, toLower } from "lodash";
+import { capitalize, debounce, get, toLower } from "lodash";
 import { colors } from "@/util/color";
 import { getPermission } from "@/permission/data";
+import { useEffect, useState } from "react";
+import { TestPlan } from "@prisma/client";
 
 const TestPlans = (props: any) => {
-  const { testPlans } = props;
   const router = useRouter();
-  const projectId = router.query.id;
+  const projectId = parseInt(`${router.query.id}`);
+
   // todo: Login session
   const userId = 1;
   const editPermission = getPermission({
@@ -21,6 +23,12 @@ const TestPlans = (props: any) => {
     role: ["OWNER"],
     route: "test-plan",
   });
+  const [testPlans, setTestPlans] = useState<TestPlan[]>();
+
+  useEffect(() => {
+    getTestPlans({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const deleteTestPlan = async (item: any) => {
     const res = await fetch("../../api/test-plan/delete", {
@@ -34,8 +42,21 @@ const TestPlans = (props: any) => {
     }
   };
 
-  // todo: search
-  const onSearch = (search: string) => {};
+  const getTestPlans = async (item: any) => {
+    const res = await fetch("../../api/test-plan/filter", {
+      method: "POST",
+      body: JSON.stringify({ projectId, ...item }),
+    });
+    if (res.ok) {
+      setTestPlans(await res.json());
+    } else {
+      alert("Failed to get requirements");
+    }
+  };
+
+  const onSearch = debounce((text) => {
+    getTestPlans({ search: text });
+  }, 150);
 
   const onPressDelete = (id: any) => {
     deleteTestPlan({ id });
@@ -121,7 +142,7 @@ const TestPlans = (props: any) => {
             <div>
               <TextInput
                 placeholder="Search"
-                onChange={(text) => onSearch(`${text}`)}
+                onChange={(e) => onSearch(e.currentTarget.value)}
               />
             </div>
           </div>

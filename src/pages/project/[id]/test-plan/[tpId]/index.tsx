@@ -7,7 +7,7 @@ import { faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { map, replace } from "lodash";
+import { filter, includes, map, replace, toLower } from "lodash";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -33,7 +33,23 @@ const TestPlans = (props: any) => {
     route: "test-plan",
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [searchReq, setSearchReq] = useState("");
+  const [searchTC, setSearchTC] = useState("");
   const { register, handleSubmit } = useForm();
+
+  const testCases = filter(
+    testCase,
+    (item) =>
+      includes(toLower(item.testCaseCode), toLower(searchTC)) ||
+      includes(toLower(item.title), toLower(searchTC))
+  );
+  const reqs = map(reference, (item) => item.req);
+  const requirements = filter(
+    reqs,
+    (item) =>
+      includes(toLower(item.reqCode), toLower(searchReq)) ||
+      includes(toLower(item.title), toLower(searchReq))
+  );
 
   // TODO: delete test case
   const updateTestPlan = async (item: any) => {
@@ -70,7 +86,8 @@ const TestPlans = (props: any) => {
   const onPressAddTestCase = () =>
     router.push(router.asPath + "/test-case/create");
   // TODO: search
-  const onSearch = (data: any) => {};
+  const onSearchReq = (text: string) => setSearchReq(text);
+  const onSearchTC = (text: string) => setSearchTC(text);
   const onSubmit = (data: any) => updateTestPlan({ id, ...data });
 
   const onPressRemove = (id: any) => {
@@ -133,7 +150,7 @@ const TestPlans = (props: any) => {
                     <div>
                       <TextInput
                         placeholder="Search"
-                        onChange={(text) => onSearch(`${text}`)}
+                        onChange={(e) => onSearchReq(e.currentTarget.value)}
                       />
                     </div>
                   </div>
@@ -153,7 +170,7 @@ const TestPlans = (props: any) => {
                       },
                       ...columns,
                     ]}
-                    dataSource={map(reference, (item) => item.req)}
+                    dataSource={requirements}
                     rowKey={(data) => `${data.id}`}
                   />
                 </div>
@@ -181,7 +198,7 @@ const TestPlans = (props: any) => {
                     <div>
                       <TextInput
                         placeholder="Search"
-                        onChange={(text) => onSearch(`${text}`)}
+                        onChange={(e) => onSearchTC(e.currentTarget.value)}
                       />
                     </div>
                   </div>
@@ -201,7 +218,7 @@ const TestPlans = (props: any) => {
                       },
                       ...testCaseColumns,
                     ]}
-                    dataSource={testCase}
+                    dataSource={testCases}
                     rowKey={(data) => `${data.id}`}
                   />
                 </div>

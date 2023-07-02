@@ -6,15 +6,16 @@ import { useRouter } from "next/router";
 import { prisma } from "server/db/client";
 import { Checkbox, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { find } from "lodash";
+import { debounce, find } from "lodash";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { getPermission } from "@/permission/data";
+import { useEffect, useState } from "react";
+import { Requirement } from "@prisma/client";
 
 const SelectRequirements = (props: any) => {
-  const { requirements } = props;
   const router = useRouter();
-  const { id: projectId, tpId } = router.query;
-
+  const { id, tpId } = router.query;
+  const projectId = parseInt(`${id}`);
   // todo: Login session
   const userId = 1;
   const editPermission = getPermission({
@@ -22,6 +23,12 @@ const SelectRequirements = (props: any) => {
     role: ["OWNER"],
     route: "test-plan",
   });
+  const [requirements, setRequirements] = useState<Requirement[]>();
+
+  useEffect(() => {
+    getRequirements({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const updateReference = async (item: any) => {
     const res = await fetch("../../../../api/reference/update", {
@@ -35,9 +42,23 @@ const SelectRequirements = (props: any) => {
     }
   };
 
-  // todo: search
+  const getRequirements = async (item: any) => {
+    const res = await fetch("../../../../api/requirement/filter", {
+      method: "POST",
+      body: JSON.stringify({ projectId, ...item }),
+    });
+    if (res.ok) {
+      setRequirements(await res.json());
+    } else {
+      alert("Failed to get requirements");
+    }
+  };
+
+  const onSearch = debounce((text) => {
+    getRequirements({ search: text });
+  }, 150);
+
   const onPressBack = () => router.back();
-  const onSearch = (search: string) => {};
 
   const columns: ColumnsType<any> = [
     {
@@ -104,7 +125,7 @@ const SelectRequirements = (props: any) => {
             <div>
               <TextInput
                 placeholder="Search"
-                onChange={(text) => onSearch(`${text}`)}
+                onChange={(e) => onSearch(e.currentTarget.value)}
               />
             </div>
           </div>
@@ -127,11 +148,7 @@ export const getServerSideProps = async (context: any) => {
       projectId: { equals: parseInt(id) },
     },
     include: {
-      reference: {
-        include: {
-          testPlan: true,
-        },
-      },
+      reference: true,
     },
   });
   return {
