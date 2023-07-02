@@ -85,7 +85,6 @@ const TestPlans = (props: any) => {
 
   const onPressAddTestCase = () =>
     router.push(router.asPath + "/test-case/create");
-  // TODO: search
   const onSearchReq = (text: string) => setSearchReq(text);
   const onSearchTC = (text: string) => setSearchTC(text);
   const onSubmit = (data: any) => updateTestPlan({ id, ...data });

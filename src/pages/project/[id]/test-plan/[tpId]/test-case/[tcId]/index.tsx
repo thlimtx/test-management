@@ -47,8 +47,6 @@ const TestCase = (props: any) => {
   const onPressCancel = () => setIsEditing(false);
   const onPressEdit = () => setIsEditing(true);
 
-  // TODO: search
-  const onSearch = (data: any) => {};
   const onSubmit = (data: any) => {
     updateTestCase({ id, ...data });
   };
