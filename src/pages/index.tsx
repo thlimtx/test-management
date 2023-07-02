@@ -97,7 +97,6 @@ const Home = (props: any) => {
     }
   };
 
-  // todo: search
   const onSearch = debounce((text) => {
     getProjects({ search: text });
   }, 150);

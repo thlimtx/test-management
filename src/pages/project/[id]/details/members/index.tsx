@@ -78,7 +78,6 @@ const Members = (props: any) => {
 
   const onPressBack = () => router.back();
 
-  // TODO: search
   const onSearch = (data: any) => {
     setUserSearch(data);
   };
