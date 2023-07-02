@@ -2,7 +2,7 @@ import { Details } from "@/components/Details";
 import { Screen } from "@/components/Screen";
 import { jsonParse } from "@/util/format";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { prisma } from "server/db/client";
 import { memberColumns, projectFields } from "./data";
@@ -10,6 +10,8 @@ import { Button } from "@/components/Button";
 import { TextInput } from "@/components/TextInput";
 import { Table } from "antd";
 import { getPermission } from "@/permission/data";
+import { Member, User } from "@prisma/client";
+import { debounce } from "lodash";
 
 const ProjectDetails = (props: any) => {
   const { project } = props;
@@ -24,6 +26,7 @@ const ProjectDetails = (props: any) => {
   const userId = 1;
   const [isEditing, setIsEditing] = useState(false);
   const { register, handleSubmit } = useForm();
+  const [members, setMembers] = useState<(Member & { user: User })[]>();
 
   // TODO: login session
   const editPermission = getPermission({
@@ -31,6 +34,23 @@ const ProjectDetails = (props: any) => {
     role: ["OWNER"],
     route: "details",
   });
+
+  useEffect(() => {
+    getMembers({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const getMembers = async (item: any) => {
+    const res = await fetch("../../api/member/filter", {
+      method: "POST",
+      body: JSON.stringify({ ...item, projectId: id }),
+    });
+    if (res.ok) {
+      setMembers(await res.json());
+    } else {
+      alert("Failed to get project members");
+    }
+  };
 
   const updateProjectDetails = async (item: any) => {
     const res = await fetch("../../api/project/update", {
@@ -49,8 +69,10 @@ const ProjectDetails = (props: any) => {
   const onPressCancel = () => setIsEditing(false);
   const onPressEdit = () => setIsEditing(true);
 
-  // TODO: search
-  const onSearch = (data: any) => {};
+  const onSearch = debounce((text) => {
+    getMembers({ search: text });
+  }, 150);
+
   const onPressAddMember = () => router.push(router.asPath + "/members");
 
   const onSubmit = (data: any) => {
@@ -87,13 +109,13 @@ const ProjectDetails = (props: any) => {
                     <div>
                       <TextInput
                         placeholder="Search"
-                        onChange={(text) => onSearch(`${text}`)}
+                        onChange={(e) => onSearch(e.currentTarget.value)}
                       />
                     </div>
                   </div>
                   <Table
                     columns={[...memberColumns]}
-                    dataSource={project.members}
+                    dataSource={members}
                     rowKey={(data) => `${data.userId}`}
                   />
                 </div>
