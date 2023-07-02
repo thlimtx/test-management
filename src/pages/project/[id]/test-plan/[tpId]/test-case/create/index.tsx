@@ -44,12 +44,6 @@ const CreateTestCase = (props: any) => {
     }
   };
 
-  const onSelectType: MenuProps["onClick"] = ({ key }) => setValue("type", key);
-  const onSelectPriority: MenuProps["onClick"] = ({ key }) =>
-    setValue("priority", key);
-  const onSelectStatus: MenuProps["onClick"] = ({ key }) =>
-    setValue("status", key);
-
   const onPressCancel = () => router.back();
   const onSubmit = (data: any) => createTestCase(data);
 
@@ -63,6 +57,42 @@ const CreateTestCase = (props: any) => {
           registerOptions={{ required: true }}
           placeholder={`Enter ${title}`}
         />
+      </div>
+    );
+  };
+
+  const renderDropdown = (
+    id: string,
+    title: string,
+    options: MenuProps["items"]
+  ) => {
+    const onSelect: MenuProps["onClick"] = ({ key }) => setValue(id, key);
+    return (
+      <div>
+        <p className="text-fade text-xs">{title}</p>
+        <Dropdown
+          menu={{
+            items: options,
+            onClick: onSelect,
+          }}
+          trigger={["click"]}
+        >
+          <a onClick={(e) => e.preventDefault()}>
+            <div
+              id={id}
+              className={`flex flex-row items-center border border-opacity-100 rounded-sm w-full px-3 py-1.5 my-2 text-sm button`}
+            >
+              <input
+                className="flex flex-1 button bg-primaryBg"
+                {...register(id)}
+                placeholder={`Select ${title}`}
+                value={capitalize(watch(id))}
+                disabled
+              />
+              <FontAwesomeIcon icon={faChevronDown} />
+            </div>
+          </a>
+        </Dropdown>
       </div>
     );
   };
@@ -98,81 +128,9 @@ const CreateTestCase = (props: any) => {
           </div>
           {renderDetails("Description", "description")}
           <div className="flex flex-row justify-between">
-            <div>
-              <p className="text-fade text-xs">Type</p>
-              <Dropdown
-                menu={{ items: testCaseTypeOptions, onClick: onSelectType }}
-                trigger={["click"]}
-              >
-                <a onClick={(e) => e.preventDefault()}>
-                  <div
-                    id="type"
-                    className={`flex flex-row items-center border border-opacity-100 rounded-sm w-full px-3 py-1.5 my-2 text-sm button`}
-                  >
-                    <input
-                      className="flex flex-1"
-                      {...register("type")}
-                      placeholder="Select Type"
-                      value={capitalize(watch("type"))}
-                      disabled
-                    />
-                    <FontAwesomeIcon icon={faChevronDown} />
-                  </div>
-                </a>
-              </Dropdown>
-            </div>
-            <div>
-              <p className="text-fade text-xs">Priority</p>
-              <Dropdown
-                menu={{
-                  items: testCasePriorityOptions,
-                  onClick: onSelectPriority,
-                }}
-                trigger={["click"]}
-              >
-                <a onClick={(e) => e.preventDefault()}>
-                  <div
-                    id="priority"
-                    className={`flex flex-row items-center border border-opacity-100 rounded-sm w-full px-3 py-1.5 my-2 text-sm button`}
-                  >
-                    <input
-                      className="flex flex-1"
-                      {...register("priority")}
-                      placeholder="Select Priority"
-                      value={capitalize(watch("priority"))}
-                      disabled
-                    />
-                    <FontAwesomeIcon icon={faChevronDown} />
-                  </div>
-                </a>
-              </Dropdown>
-            </div>
-            <div>
-              <p className="text-fade text-xs">Status</p>
-              <Dropdown
-                menu={{
-                  items: testCaseStatusOptions,
-                  onClick: onSelectStatus,
-                }}
-                trigger={["click"]}
-              >
-                <a onClick={(e) => e.preventDefault()}>
-                  <div
-                    id="status"
-                    className={`flex flex-row items-center border border-opacity-100 rounded-sm w-full px-3 py-1.5 my-2 text-sm button`}
-                  >
-                    <input
-                      className="flex flex-1"
-                      {...register("status")}
-                      placeholder="Select Status"
-                      value={capitalize(watch("status"))}
-                      disabled
-                    />
-                    <FontAwesomeIcon icon={faChevronDown} />
-                  </div>
-                </a>
-              </Dropdown>
-            </div>
+            {renderDropdown("type", "Type", testCaseTypeOptions)}
+            {renderDropdown("priority", "Priority", testCasePriorityOptions)}
+            {renderDropdown("status", "Status", testCaseStatusOptions)}
           </div>
           {renderDetails("Precondition", "precondition")}
           {renderDetails("Steps", "steps")}
