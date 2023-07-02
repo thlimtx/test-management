@@ -9,11 +9,14 @@ import { ColumnsType } from "antd/es/table";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { getPermission } from "@/permission/data";
+import { debounce } from "lodash";
+import { useEffect, useState } from "react";
+import { Requirement } from "@prisma/client";
 
 const Requirements = (props: any) => {
-  const { requirements } = props;
   const router = useRouter();
-  const projectId = router.query.id;
+  const projectId = parseInt(`${router.query.id}`);
+
   // todo: Login session
   const userId = 1;
   const editPermission = getPermission({
@@ -21,6 +24,12 @@ const Requirements = (props: any) => {
     role: ["OWNER"],
     route: "requirement",
   });
+  const [requirements, setRequirements] = useState<Requirement[]>();
+
+  useEffect(() => {
+    getRequirements({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const deleteRequirement = async (item: any) => {
     const res = await fetch("../../api/requirement/delete", {
@@ -34,8 +43,21 @@ const Requirements = (props: any) => {
     }
   };
 
-  // todo: search
-  const onSearch = (search: string) => {};
+  const getRequirements = async (item: any) => {
+    const res = await fetch("../../api/requirement/filter", {
+      method: "POST",
+      body: JSON.stringify({ projectId, ...item }),
+    });
+    if (res.ok) {
+      setRequirements(await res.json());
+    } else {
+      alert("Failed to get requirements");
+    }
+  };
+
+  const onSearch = debounce((text) => {
+    getRequirements({ search: text });
+  }, 150);
 
   const onPressDelete = (id: any) => {
     deleteRequirement({ id });
@@ -104,7 +126,7 @@ const Requirements = (props: any) => {
             <div>
               <TextInput
                 placeholder="Search"
-                onChange={(text) => onSearch(`${text}`)}
+                onChange={(e) => onSearch(e.currentTarget.value)}
               />
             </div>
           </div>
@@ -117,19 +139,6 @@ const Requirements = (props: any) => {
       </div>
     </Screen>
   );
-};
-
-export const getServerSideProps = async (context: any) => {
-  // todo: Login session
-  const { id } = context.query;
-  const requirements = await prisma.requirement.findMany({
-    where: { projectId: { equals: parseInt(id) } },
-  });
-  return {
-    props: {
-      requirements: jsonParse(requirements),
-    },
-  };
 };
 
 export default Requirements;
