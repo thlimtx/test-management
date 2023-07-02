@@ -1,8 +1,26 @@
 import { RenderProps } from "@/components/Details/props";
-import { colors } from "@/util/color";
-import { capitalize, get, toLower } from "lodash";
+import { getDropdownOptionsbyType } from "@/util/data";
+import { TestPriority, TestStatus, TestType } from "@prisma/client";
 
-export const testCaseFields = [
+export const testCaseDropFields = [
+  {
+    id: "type",
+    title: "Type",
+    options: getDropdownOptionsbyType(TestType),
+  },
+  {
+    id: "priority",
+    title: "Priority",
+    options: getDropdownOptionsbyType(TestPriority),
+  },
+  {
+    id: "status",
+    title: "Status",
+    options: getDropdownOptionsbyType(TestStatus),
+  },
+];
+
+export const testCaseFields1 = [
   {
     render: ({ renderDetails }: RenderProps) => {
       return (
@@ -27,36 +45,9 @@ export const testCaseFields = [
     title: "Description",
     placeholder: "Enter Description",
   },
-  {
-    render: ({ renderDetails, data }: RenderProps) => {
-      const statusColor = get(colors, toLower(data.status));
-      return (
-        <div className="flex flex-row">
-          {renderDetails({
-            id: "type",
-            title: "Type",
-            editable: false,
-          })}
-          {renderDetails({
-            id: "priority",
-            title: "Priority",
-            editable: false,
-          })}
-          <div
-            className={`flex flex-1 flex-col`}
-            style={{ color: statusColor }}
-          >
-            {renderDetails({
-              id: "status",
-              title: "Status",
-              editable: false,
-              renderText: (text: any) => capitalize(text),
-            })}
-          </div>
-        </div>
-      );
-    },
-  },
+];
+
+export const testCaseFields2 = [
   {
     render: ({ renderDetails }: RenderProps) => {
       return (
