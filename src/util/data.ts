@@ -17,9 +17,9 @@ export const getDropdownOptionsbyType = (type: any, omit?: string[]) => {
   );
 };
 
-export const getFilter = (data: any) => {
-  const filter = mapValues(data, (item) => {
-    return { contains: item, mode: "insensitive" };
+export const getFilter = (data: object) => {
+  const filter = map(data, (item, key) => {
+    return { [key]: { contains: item, mode: "insensitive" } };
   });
   return filter;
 };

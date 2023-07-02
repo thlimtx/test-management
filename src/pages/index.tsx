@@ -99,7 +99,7 @@ const Home = (props: any) => {
 
   // todo: search
   const onSearch = debounce((text) => {
-    getProjects({ name: text });
+    getProjects({ search: text });
   }, 150);
 
   const onPressCreateProject = () => {
