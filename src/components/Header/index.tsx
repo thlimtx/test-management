@@ -77,14 +77,15 @@ export const Header = (props: any) => {
           <div className="flex flex-row items-center">
             <Button
               text="Sign up"
-              className="mr-5 rounded-full"
+              className="mr-5 border-none shadow-none"
               type="invert"
-              onPress={() => router.push("/signup")}
+              onPress={() => router.push("/auth/signup")}
             />
             <Button
               text="Login"
-              className="rounded-full"
-              onPress={() => router.push("/login")}
+              className="border-none shadow-none"
+              type="invert"
+              onPress={() => signIn()}
             />
           </div>
         )}

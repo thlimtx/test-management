@@ -13,7 +13,7 @@ const Signup = () => {
   } = useForm();
 
   const createUser = async (item: any) => {
-    const res = await fetch("api/user/create", {
+    const res = await fetch("../api/user/create", {
       method: "POST",
       body: JSON.stringify({ ...item }),
     });

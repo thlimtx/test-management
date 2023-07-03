@@ -2,6 +2,7 @@ import { Form } from "@/components/Form";
 import { Screen } from "@/components/Screen";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
+import { signIn } from "next-auth/react";
 
 const Login = () => {
   const router = useRouter();
@@ -11,7 +12,14 @@ const Login = () => {
     watch,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data: any) => console.log({ data });
+  const onSubmit = async (data: any) => {
+    const res = await signIn("credentials", {
+      email: data.email,
+      password: data.password,
+      redirect: false,
+    });
+    // todo: login response
+  };
   return (
     <Screen>
       <Form
@@ -28,7 +36,7 @@ const Login = () => {
           },
         ]}
         buttons={[
-          { text: "Signup", onPress: () => router.push("/signup") },
+          { text: "Signup", onPress: () => router.push("/auth/signup") },
           { text: "Login", onPress: handleSubmit(onSubmit) },
         ]}
         // footer={
