@@ -1,22 +1,34 @@
 import { Button } from "@/components/Button";
 import { Screen } from "@/components/Screen";
-import { Sidebar } from "@/components/Sidebar";
 import { TextInput } from "@/components/TextInput";
 import { formatDate, jsonParse } from "@/util/format";
 import { useRouter } from "next/router";
 import { prisma } from "server/db/client";
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import { toLower } from "lodash";
+import { capitalize, debounce, get, toLower } from "lodash";
+import { colors } from "@/util/color";
+import { getPermission } from "@/permission/data";
+import { useEffect, useState } from "react";
+import { TestPlan } from "@prisma/client";
 
 const TestPlans = (props: any) => {
-  const { testPlans } = props;
   const router = useRouter();
-  const projectId = router.query.id;
+  const projectId = parseInt(`${router.query.id}`);
+
   // todo: Login session
   const userId = 1;
+  const editPermission = getPermission({
+    action: "edit",
+    role: ["OWNER"],
+    route: "test-plan",
+  });
+  const [testPlans, setTestPlans] = useState<TestPlan[]>();
+
+  useEffect(() => {
+    getTestPlans({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const deleteTestPlan = async (item: any) => {
     const res = await fetch("../../api/test-plan/delete", {
@@ -30,8 +42,21 @@ const TestPlans = (props: any) => {
     }
   };
 
-  // todo: search
-  const onSearch = (search: string) => {};
+  const getTestPlans = async (item: any) => {
+    const res = await fetch("../../api/test-plan/filter", {
+      method: "POST",
+      body: JSON.stringify({ projectId, ...item }),
+    });
+    if (res.ok) {
+      setTestPlans(await res.json());
+    } else {
+      alert("Failed to get requirements");
+    }
+  };
+
+  const onSearch = debounce((text) => {
+    getTestPlans({ search: text });
+  }, 150);
 
   const onPressDelete = (id: any) => {
     deleteTestPlan({ id });
@@ -72,8 +97,11 @@ const TestPlans = (props: any) => {
       dataIndex: "status",
       key: "status",
       render: (value) => {
-        const color = `text-${toLower(value)}`;
-        return <p className={color}>{value}</p>;
+        return (
+          <p style={{ color: get(colors, toLower(value)) }}>
+            {capitalize(value)}
+          </p>
+        );
       },
     },
     // TODO: handle delete
@@ -95,13 +123,12 @@ const TestPlans = (props: any) => {
   ];
 
   return (
-    <Screen>
-      <div className="flex flex-1">
-        <Sidebar />
-        <div className="flex-1 py-3 px-5">
-          <p className="text-2xl font-bold italic mb-5">Test Plans</p>
-          <div className="p-4 my-2 bg-primaryBg shadow">
-            <div className="flex flex-row justify-between items-center">
+    <Screen sidebar>
+      <div className="flex-1 py-3 px-5">
+        <p className="text-2xl font-bold italic mb-5">Test Plans</p>
+        <div className="p-4 my-2 bg-primaryBg shadow">
+          <div className="flex flex-row justify-between items-center">
+            {editPermission ? (
               <Button
                 type="invert"
                 text="Add"
@@ -109,17 +136,21 @@ const TestPlans = (props: any) => {
                 textClassName="text-textPrimary"
                 onPress={onPressAddTestPlan}
               />
+            ) : (
+              <div />
+            )}
+            <div>
               <TextInput
                 placeholder="Search"
-                onChange={(text) => onSearch(`${text}`)}
+                onChange={(e) => onSearch(e.currentTarget.value)}
               />
             </div>
-            <Table
-              columns={columns}
-              dataSource={testPlans}
-              rowKey={(data) => `${data.id}`}
-            />
           </div>
+          <Table
+            columns={columns}
+            dataSource={testPlans}
+            rowKey={(data) => `${data.id}`}
+          />
         </div>
       </div>
     </Screen>

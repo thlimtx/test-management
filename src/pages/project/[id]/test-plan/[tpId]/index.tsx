@@ -1,19 +1,19 @@
 import { Button } from "@/components/Button";
 import { Details } from "@/components/Details";
 import { Screen } from "@/components/Screen";
-import { Sidebar } from "@/components/Sidebar";
 import { TextInput } from "@/components/TextInput";
 import { formatDate, jsonParse } from "@/util/format";
 import { faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { map, replace } from "lodash";
+import { filter, includes, map, replace, toLower } from "lodash";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { prisma } from "server/db/client";
 import { TestPlanFields, requirementsColumns, testCaseColumns } from "./data";
+import { getPermission } from "@/permission/data";
 
 const TestPlans = (props: any) => {
   const { testPlan } = props;
@@ -27,9 +27,31 @@ const TestPlans = (props: any) => {
   const { projectId, id, reference, testCase } = data;
   // todo: Login session
   const userId = 1;
+  const editPermission = getPermission({
+    action: "edit",
+    role: ["OWNER"],
+    route: "test-plan",
+  });
   const [isEditing, setIsEditing] = useState(false);
+  const [searchReq, setSearchReq] = useState("");
+  const [searchTC, setSearchTC] = useState("");
   const { register, handleSubmit } = useForm();
 
+  const testCases = filter(
+    testCase,
+    (item) =>
+      includes(toLower(item.testCaseCode), toLower(searchTC)) ||
+      includes(toLower(item.title), toLower(searchTC))
+  );
+  const reqs = map(reference, (item) => item.req);
+  const requirements = filter(
+    reqs,
+    (item) =>
+      includes(toLower(item.reqCode), toLower(searchReq)) ||
+      includes(toLower(item.title), toLower(searchReq))
+  );
+
+  // TODO: delete test case
   const updateTestPlan = async (item: any) => {
     const res = await fetch("../../../api/test-plan/update", {
       method: "POST",
@@ -63,8 +85,8 @@ const TestPlans = (props: any) => {
 
   const onPressAddTestCase = () =>
     router.push(router.asPath + "/test-case/create");
-  // TODO: search
-  const onSearch = (data: any) => {};
+  const onSearchReq = (text: string) => setSearchReq(text);
+  const onSearchTC = (text: string) => setSearchTC(text);
   const onSubmit = (data: any) => updateTestPlan({ id, ...data });
 
   const onPressRemove = (id: any) => {
@@ -73,45 +95,46 @@ const TestPlans = (props: any) => {
 
   const columns: ColumnsType<any> = [
     ...requirementsColumns,
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => {
-        return (
-          <FontAwesomeIcon
-            className="button self-center"
-            style={{ color: "red" }}
-            onClick={() => onPressRemove(record.id)}
-            icon={faXmark}
-          />
-        );
-      },
-      width: 50,
-    },
+    editPermission
+      ? {
+          title: "Action",
+          key: "action",
+          render: (_, record) => {
+            return (
+              <FontAwesomeIcon
+                className="button self-center"
+                style={{ color: "red" }}
+                onClick={() => onPressRemove(record.id)}
+                icon={faXmark}
+              />
+            );
+          },
+          width: 50,
+        }
+      : {},
   ];
 
   return (
-    <Screen>
-      <div className="flex flex-1">
-        <Sidebar />
-        <Details
-          isEditing={isEditing}
-          editable
-          register={register}
-          title="Test Plans"
-          onPressBack={onPressBack}
-          onPressCancel={onPressCancel}
-          onPressEdit={onPressEdit}
-          onPressSave={handleSubmit(onSubmit)}
-          data={data}
-          fields={[
-            ...TestPlanFields,
-            {
-              render: ({}) => {
-                return (
-                  <div className="">
-                    <p className="text-lg font-bold my-3">Requirements</p>
-                    <div className="flex flex-row justify-between items-center">
+    <Screen sidebar>
+      <Details
+        isEditing={isEditing}
+        editable={editPermission}
+        register={register}
+        title="Test Plans"
+        onPressBack={onPressBack}
+        onPressCancel={onPressCancel}
+        onPressEdit={onPressEdit}
+        onPressSave={handleSubmit(onSubmit)}
+        data={data}
+        fields={[
+          ...TestPlanFields,
+          {
+            render: ({}) => {
+              return (
+                <div className="">
+                  <p className="text-lg font-bold my-3">Requirements</p>
+                  <div className="flex flex-row justify-between items-center">
+                    {editPermission ? (
                       <Button
                         type="invert"
                         text="Add"
@@ -120,40 +143,46 @@ const TestPlans = (props: any) => {
                         icon={faPlus}
                         onPress={onPressAddRequirement}
                       />
+                    ) : (
+                      <div />
+                    )}
+                    <div>
                       <TextInput
                         placeholder="Search"
-                        onChange={(text) => onSearch(`${text}`)}
+                        onChange={(e) => onSearchReq(e.currentTarget.value)}
                       />
                     </div>
-                    <Table
-                      columns={[
-                        {
-                          title: "Code",
-                          key: "reqCode",
-                          width: 50,
-                          render: (value) => (
-                            <a
-                              href={`/project/${projectId}/requirement/${value.id}`}
-                            >
-                              {value.reqCode}
-                            </a>
-                          ),
-                        },
-                        ...columns,
-                      ]}
-                      dataSource={map(reference, (item) => item.req)}
-                      rowKey={(data) => `${data.id}`}
-                    />
                   </div>
-                );
-              },
+                  <Table
+                    columns={[
+                      {
+                        title: "Code",
+                        key: "reqCode",
+                        width: 50,
+                        render: (value) => (
+                          <a
+                            href={`/project/${projectId}/requirement/${value.id}`}
+                          >
+                            {value.reqCode}
+                          </a>
+                        ),
+                      },
+                      ...columns,
+                    ]}
+                    dataSource={requirements}
+                    rowKey={(data) => `${data.id}`}
+                  />
+                </div>
+              );
             },
-            {
-              render: ({}) => {
-                return (
-                  <div className="">
-                    <p className="text-lg font-bold my-3">Test Case</p>
-                    <div className="flex flex-row justify-between items-center">
+          },
+          {
+            render: ({}) => {
+              return (
+                <div className="">
+                  <p className="text-lg font-bold my-3">Test Case</p>
+                  <div className="flex flex-row justify-between items-center">
+                    {editPermission ? (
                       <Button
                         type="invert"
                         text="Add"
@@ -162,37 +191,41 @@ const TestPlans = (props: any) => {
                         icon={faPlus}
                         onPress={onPressAddTestCase}
                       />
+                    ) : (
+                      <div />
+                    )}
+                    <div>
                       <TextInput
                         placeholder="Search"
-                        onChange={(text) => onSearch(`${text}`)}
+                        onChange={(e) => onSearchTC(e.currentTarget.value)}
                       />
                     </div>
-                    <Table
-                      columns={[
-                        {
-                          title: "Code",
-                          key: "testCaseCode",
-                          width: 50,
-                          render: (value) => (
-                            <a
-                              href={`/project/${projectId}/test-plan/${id}/test-case/${value.id}`}
-                            >
-                              {value.testCaseCode}
-                            </a>
-                          ),
-                        },
-                        ...testCaseColumns,
-                      ]}
-                      dataSource={testCase}
-                      rowKey={(data) => `${data.id}`}
-                    />
                   </div>
-                );
-              },
+                  <Table
+                    columns={[
+                      {
+                        title: "Code",
+                        key: "testCaseCode",
+                        width: 50,
+                        render: (value) => (
+                          <a
+                            href={`/project/${projectId}/test-plan/${id}/test-case/${value.id}`}
+                          >
+                            {value.testCaseCode}
+                          </a>
+                        ),
+                      },
+                      ...testCaseColumns,
+                    ]}
+                    dataSource={testCases}
+                    rowKey={(data) => `${data.id}`}
+                  />
+                </div>
+              );
             },
-          ]}
-        />
-      </div>
+          },
+        ]}
+      />
     </Screen>
   );
 };

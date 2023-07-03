@@ -7,3 +7,16 @@ export const jsonParse = (data: any) => {
 export const formatDate = (date: any, format?: string) => {
   return date ? moment(date).format(format ?? "DD/MM/YYYY") : "-";
 };
+
+export const formatDuration = (time: any, format?: any) => {
+  const duration = time
+    ? moment.duration(time, format ?? "milliseconds").toISOString()
+    : "-";
+  const durationDisplay = duration
+    .replace("P", "")
+    .replace("T", "")
+    .replace("H", ":")
+    .replace("M", ":")
+    .replace("S", "");
+  return durationDisplay;
+};

@@ -29,8 +29,15 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+.sidebar-frame {
+  width: var(--sidebar-width);
+  z-index: 40;
+}
+
 .sidebar {
   width: var(--sidebar-width);
+  position: fixed;
+  height: calc(100% - var(--header-offset));
 }
 
 .sidebar-item:hover {

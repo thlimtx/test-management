@@ -1,13 +1,16 @@
 import { Details } from "@/components/Details";
 import { Screen } from "@/components/Screen";
-import { Sidebar } from "@/components/Sidebar";
 import { formatDate, jsonParse } from "@/util/format";
-import { replace } from "lodash";
+import { capitalize, get, map, replace, toLower } from "lodash";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { prisma } from "server/db/client";
-import { testCaseFields } from "./data";
+import { testCaseDropFields, testCaseFields1, testCaseFields2 } from "./data";
+import { getPermission } from "@/permission/data";
+import { RenderProps } from "@/components/Details/props";
+import { colors } from "@/util/color";
+import { FormDropdown } from "@/components/FormDropdown";
 
 const TestCase = (props: any) => {
   const { testCase } = props;
@@ -18,11 +21,16 @@ const TestCase = (props: any) => {
 
   const router = useRouter();
 
-  const { id, testPlanId } = data;
+  const { id } = data;
   // todo: Login session
   const userId = 1;
+  const editPermission = getPermission({
+    action: "edit",
+    role: ["OWNER"],
+    route: "test-case",
+  });
   const [isEditing, setIsEditing] = useState(false);
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, watch, setValue } = useForm();
 
   const updateTestCase = async (item: any) => {
     const res = await fetch("../../../../../api/test-case/update", {
@@ -42,29 +50,73 @@ const TestCase = (props: any) => {
   const onPressCancel = () => setIsEditing(false);
   const onPressEdit = () => setIsEditing(true);
 
-  // TODO: search
-  const onSearch = (data: any) => {};
   const onSubmit = (data: any) => {
     updateTestCase({ id, ...data });
   };
 
+  const testCaseFields = [
+    ...testCaseFields1,
+    {
+      render: ({ renderDetails, data, isEditing }: RenderProps) => {
+        const statusColor = get(colors, toLower(data.status));
+        return isEditing ? (
+          <div className="flex flex-row justify-between">
+            {map(testCaseDropFields, (item) => {
+              const { id, title, options } = item;
+              const value = watch(id);
+              const onSelect = (key: string, value?: string) =>
+                setValue(key, value);
+              return (
+                <FormDropdown
+                  {...{ register, id, title, options, value, onSelect }}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex flex-row">
+            {renderDetails({
+              id: "type",
+              title: "Type",
+              editable: false,
+            })}
+            {renderDetails({
+              id: "priority",
+              title: "Priority",
+              editable: false,
+            })}
+            <div
+              className={`flex flex-1 flex-col`}
+              style={{ color: statusColor }}
+            >
+              {renderDetails({
+                id: "status",
+                title: "Status",
+                editable: false,
+                renderText: (text: any) => capitalize(text),
+              })}
+            </div>
+          </div>
+        );
+      },
+    },
+    ...testCaseFields2,
+  ];
+
   return (
-    <Screen>
-      <div className="flex flex-1">
-        <Sidebar />
-        <Details
-          isEditing={isEditing}
-          editable
-          register={register}
-          title="Test Case"
-          onPressBack={onPressBack}
-          onPressCancel={onPressCancel}
-          onPressEdit={onPressEdit}
-          onPressSave={handleSubmit(onSubmit)}
-          data={data}
-          fields={[...testCaseFields]}
-        />
-      </div>
+    <Screen sidebar>
+      <Details
+        isEditing={isEditing}
+        editable={editPermission}
+        register={register}
+        title="Test Case"
+        onPressBack={onPressBack}
+        onPressCancel={onPressCancel}
+        onPressEdit={onPressEdit}
+        onPressSave={handleSubmit(onSubmit)}
+        data={data}
+        fields={[...testCaseFields]}
+      />
     </Screen>
   );
 };

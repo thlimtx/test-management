@@ -1,15 +1,10 @@
-import { RenderDetailsProps } from "@/components/Details/props";
+import { RenderProps } from "@/components/Details/props";
+import { colors } from "@/util/color";
 import { formatDate } from "@/util/format";
 import { ColumnsType } from "antd/es/table";
-import { toLower } from "lodash";
+import { capitalize, get, toLower } from "lodash";
 
 export const requirementsColumns: ColumnsType<any> = [
-  {
-    title: "Code",
-    key: "reqCode",
-    dataIndex: "reqCode",
-    width: 50,
-  },
   {
     title: "Title",
     dataIndex: "title",
@@ -44,15 +39,18 @@ export const testCaseColumns: ColumnsType<any> = [
     dataIndex: "status",
     key: "status",
     render: (value) => {
-      const color = `text-${toLower(value)}`;
-      return <p className={color}>{value}</p>;
+      return (
+        <p style={{ color: get(colors, toLower(value)) }}>
+          {capitalize(value)}
+        </p>
+      );
     },
   },
 ];
 
 export const TestPlanFields = [
   {
-    render: ({ renderDetails }: RenderDetailsProps) => {
+    render: ({ renderDetails }: RenderProps) => {
       return (
         <div className="flex flex-row">
           {renderDetails({
@@ -76,8 +74,8 @@ export const TestPlanFields = [
     placeholder: "Enter Description",
   },
   {
-    render: ({ renderDetails, data }: RenderDetailsProps) => {
-      const statusColor = `text-${toLower(data.status)}`;
+    render: ({ renderDetails, data }: RenderProps) => {
+      const statusColor = get(colors, toLower(data.status));
       return (
         <div className="flex flex-row justify-evenly">
           {renderDetails({
@@ -91,12 +89,15 @@ export const TestPlanFields = [
             placeholder: "Enter Last Executed Date",
             editable: false,
           })}
-          <div className={`flex flex-1 flex-col ${statusColor}`}>
+          <div
+            className={`flex flex-1 flex-col`}
+            style={{ color: statusColor }}
+          >
             {renderDetails({
               id: "status",
               title: "Status",
-              placeholder: "Enter Status",
               editable: false,
+              renderText: (text: any) => capitalize(text),
             })}
           </div>
         </div>

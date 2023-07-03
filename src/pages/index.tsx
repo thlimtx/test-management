@@ -6,13 +6,14 @@ import { Box } from "@/components/Box";
 import { useRouter } from "next/router";
 import {
   capitalize,
+  debounce,
   filter,
   find,
   isEmpty,
+  join,
   map,
   size,
   some,
-  sortBy,
 } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
@@ -20,55 +21,85 @@ import { TextInput } from "@/components/TextInput";
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import moment from "moment";
-
-const columns: ColumnsType<any> = [
-  {
-    title: "Name",
-    dataIndex: "name",
-    key: "name",
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "Version",
-    dataIndex: "version",
-    key: "version",
-  },
-  {
-    title: "Tools",
-    dataIndex: "tools",
-    key: "tools",
-  },
-  {
-    title: "Role",
-    dataIndex: "role",
-    key: "role",
-  },
-  {
-    title: "Members",
-    key: "member",
-    render: (item) => {
-      return size(item.members);
-    },
-  },
-  {
-    title: "Last Updated",
-    dataIndex: "updatedAt",
-    key: "updatedAt",
-    render: (item) => moment(item).format("DD/MM/YYYY"),
-  },
-];
+import { useEffect, useState } from "react";
+import { Member, Project } from "@prisma/client";
 
 const Home = (props: any) => {
   const userId = 1;
   const router = useRouter();
-  const { projects } = props;
-  const hasProject = !isEmpty(projects);
-  const projectsOwned = filter(projects, (item) =>
+  const { recentProjects, allProjects } = props;
+  const [projects, setProjects] =
+    useState<(Project & { members: Member[] })[]>(allProjects);
+
+  const hasProject = !isEmpty(allProjects);
+  const projectsOwned = filter(allProjects, (item) =>
     some(item.members, { userId, role: ["OWNER"] })
   );
 
-  // todo: search
-  const onSearch = (search: string) => {};
+  useEffect(() => {
+    getProjects({});
+  }, []);
+
+  const columns: ColumnsType<any> = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: "Version",
+      dataIndex: "version",
+      key: "version",
+    },
+    {
+      title: "Tools",
+      dataIndex: "tools",
+      key: "tools",
+    },
+    {
+      title: "Role",
+      key: "role",
+      render: (data: any) => {
+        const curUser = find(data.members, (o) => {
+          return o.userId === userId;
+        });
+        return join(
+          map(curUser.role, (o) => capitalize(o)),
+          ", "
+        );
+      },
+    },
+    {
+      title: "Members",
+      key: "members",
+      render: (item) => {
+        return size(item.members);
+      },
+    },
+    {
+      title: "Last Updated",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      render: (item) => moment(item).format("DD/MM/YYYY"),
+    },
+  ];
+
+  const getProjects = async (item: any) => {
+    const res = await fetch("/api/project/filter", {
+      method: "POST",
+      body: JSON.stringify({ userId, ...item }),
+    });
+    if (res.ok) {
+      setProjects(await res.json());
+    } else {
+      alert("Failed to get projects");
+    }
+  };
+
+  const onSearch = debounce((text) => {
+    getProjects({ search: text });
+  }, 150);
 
   const onPressCreateProject = () => {
     router.push("/project/create");
@@ -82,10 +113,24 @@ const Home = (props: any) => {
     <Screen>
       {hasProject ? (
         <div className="flex flex-1">
+          {/** SIDEBAR */}
+          <div className="sidebar-frame">
+            <div className="sidebar bg-primaryBg p-5">
+              <div className="flex flex-row justify-between my-2">
+                <p className="font-bold">Projects Owned</p>
+                <p>{size(projectsOwned)}</p>
+              </div>
+              <div className="flex flex-row justify-between my-2">
+                <p className="font-bold">Total Projects</p>
+                <p>{size(allProjects)}</p>
+              </div>
+            </div>
+          </div>
+
           <div className="maincontent flex-1 py-5 px-10">
             <p className="text-2xl font-bold italic mb-5">Recent Changes</p>
             <div className="flex flex-row flex-wrap">
-              {map(sortBy(projects, [(o) => o.updatedAt]), (item, index) => {
+              {map(recentProjects, (item, index) => {
                 return (
                   <div
                     key={index}
@@ -121,7 +166,6 @@ const Home = (props: any) => {
             </div>
             <p className="text-2xl font-bold italic mb-4">Projects</p>
             <div className="flex flex-row justify-between items-center">
-              {/* <div> */}
               <Button
                 type="invert"
                 text="Start a project"
@@ -129,29 +173,18 @@ const Home = (props: any) => {
                 textClassName="text-textPrimary"
                 onPress={onPressCreateProject}
               />
-              {/* </div> */}
-              <TextInput
-                placeholder="Search"
-                onChange={(text) => onSearch(`${text}`)}
-              />
+              <div>
+                <TextInput
+                  placeholder="Search"
+                  onChange={(e) => onSearch(e.currentTarget.value)}
+                />
+              </div>
             </div>
             <Table
               columns={columns}
               dataSource={projects}
               rowKey={(data) => `${data.id}`}
             />
-          </div>
-
-          {/** SIDEBAR */}
-          <div className="sidebar bg-primaryBg p-5">
-            <div className="flex flex-row justify-between my-2">
-              <p className="font-bold">Projects Owned</p>
-              <p>{size(projectsOwned)}</p>
-            </div>
-            <div className="flex flex-row justify-between my-2">
-              <p className="font-bold">Total Projects</p>
-              <p>{size(projects)}</p>
-            </div>
           </div>
         </div>
       ) : (
@@ -177,15 +210,25 @@ const Home = (props: any) => {
 
 export const getServerSideProps = async (context: any) => {
   const userId = 1;
+  const recentProjects = await prisma.project.findMany({
+    where: { members: { some: { userId } } },
+    include: {
+      members: true,
+    },
+    orderBy: { updatedAt: "desc" },
+    take: 4,
+  });
   const projects = await prisma.project.findMany({
     where: { members: { some: { userId } } },
     include: {
       members: true,
     },
+    orderBy: { updatedAt: "desc" },
   });
   return {
     props: {
-      projects: jsonParse(projects),
+      recentProjects: jsonParse(recentProjects),
+      allProjects: jsonParse(projects),
     },
   };
 };

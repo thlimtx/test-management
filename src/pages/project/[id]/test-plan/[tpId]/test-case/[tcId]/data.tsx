@@ -1,9 +1,28 @@
-import { RenderDetailsProps } from "@/components/Details/props";
-import { toLower } from "lodash";
+import { RenderProps } from "@/components/Details/props";
+import { getDropdownOptionsbyType } from "@/util/data";
+import { TestPriority, TestStatus, TestType } from "@prisma/client";
 
-export const testCaseFields = [
+export const testCaseDropFields = [
   {
-    render: ({ renderDetails }: RenderDetailsProps) => {
+    id: "type",
+    title: "Type",
+    options: getDropdownOptionsbyType(TestType),
+  },
+  {
+    id: "priority",
+    title: "Priority",
+    options: getDropdownOptionsbyType(TestPriority),
+  },
+  {
+    id: "status",
+    title: "Status",
+    options: getDropdownOptionsbyType(TestStatus),
+  },
+];
+
+export const testCaseFields1 = [
+  {
+    render: ({ renderDetails }: RenderProps) => {
       return (
         <div className="flex flex-row">
           {renderDetails({
@@ -26,32 +45,11 @@ export const testCaseFields = [
     title: "Description",
     placeholder: "Enter Description",
   },
+];
+
+export const testCaseFields2 = [
   {
-    render: ({ renderDetails }: RenderDetailsProps) => {
-      return (
-        <div className="flex flex-row">
-          {renderDetails({
-            id: "type",
-            title: "Type",
-            editable: false,
-          })}
-          {renderDetails({
-            id: "priority",
-            title: "Priority",
-            editable: false,
-          })}
-          {renderDetails({
-            id: "status",
-            title: "Status",
-            editable: false,
-          })}
-        </div>
-      );
-    },
-  },
-  {
-    render: ({ renderDetails, data }: RenderDetailsProps) => {
-      const statusColor = `text-${toLower(data.status)}`;
+    render: ({ renderDetails }: RenderProps) => {
       return (
         <div className="flex flex-row justify-evenly">
           {renderDetails({

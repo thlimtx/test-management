@@ -1,4 +1,4 @@
-import { DetailsProps, FieldItem } from "./props";
+import { DetailsProps, RenderDetailsProps } from "./props";
 import { TextInput } from "../TextInput";
 import { Button } from "../Button";
 import map from "lodash/map";
@@ -8,8 +8,7 @@ import {
   faPen,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import { isEmpty } from "lodash";
-import { useRouter } from "next/router";
+import { has, isEmpty } from "lodash";
 
 export const Details = (props: DetailsProps) => {
   const {
@@ -30,20 +29,27 @@ export const Details = (props: DetailsProps) => {
    * Render the default component for each field
    * @param item Each item in field props
    */
-  const renderDetails = (item: FieldItem) => {
-    const { title, register: curRegister, render, ...rest } = item;
+  const renderDetails = (item: RenderDetailsProps) => {
+    const { title, register: curRegister, renderText, ...rest } = item;
+    const dataValue = data[`${item.id}`];
     return (
       <div className="flex flex-1 flex-col">
         <p className="text-fade text-xs my-1.5">{title}</p>
         {editable && isEditing && item.editable !== false ? (
           <TextInput
-            defaultValue={data[`${item.id}`]}
+            defaultValue={dataValue}
             {...rest}
             register={register}
             registerOptions={curRegister}
           />
         ) : (
-          <p>{isEmpty(data[`${item.id}`]) ? "-" : data[`${item.id}`]}</p>
+          <p>
+            {renderText
+              ? renderText(dataValue)
+              : isEmpty(dataValue)
+              ? "-"
+              : dataValue}
+          </p>
         )}
       </div>
     );
@@ -53,46 +59,49 @@ export const Details = (props: DetailsProps) => {
     <div className={`flex-1 py-3 px-5 ${className}`}>
       <div className="flex flex-row justify-between items-center mb-3">
         <p className="text-2xl font-bold italic">{title}</p>
-        {editable &&
-          (isEditing ? (
-            <div className="flex flex-row">
-              <Button
-                text="Cancel"
-                className="mr-3 border-textPrimary"
-                icon={faXmark}
-                type="invert"
-                textClassName="text-textPrimary"
-                onPress={onPressCancel}
-              />
-              <Button
-                text="Save"
-                className="border-textPrimary"
-                icon={faFloppyDisk}
-                type="invert"
-                textClassName="text-textPrimary"
-                onPress={onPressSave}
-              />
-            </div>
-          ) : (
-            <div className="flex flex-row">
+        {isEditing ? (
+          <div className="flex flex-row">
+            <Button
+              text="Cancel"
+              className="mr-3 border-textPrimary"
+              icon={faXmark}
+              type="invert"
+              textClassName="text-textPrimary"
+              onPress={onPressCancel}
+            />
+            <Button
+              text="Save"
+              className="border-textPrimary"
+              icon={faFloppyDisk}
+              type="invert"
+              textClassName="text-textPrimary"
+              onPress={onPressSave}
+            />
+          </div>
+        ) : (
+          <div className="flex flex-row">
+            {has(props, "onPressBack") && (
               <Button
                 text="Back"
-                className="mr-3 border-textPrimary"
+                className="border-textPrimary"
                 icon={faArrowLeft}
                 type="invert"
                 textClassName="text-textPrimary"
                 onPress={onPressBack}
               />
+            )}
+            {editable && (
               <Button
                 text="Edit"
-                className="border-textPrimary"
+                className="ml-3 border-textPrimary"
                 icon={faPen}
                 type="invert"
                 textClassName="text-textPrimary"
                 onPress={onPressEdit}
               />
-            </div>
-          ))}
+            )}
+          </div>
+        )}
       </div>
       <div className="p-4 my-2 bg-primaryBg shadow">
         {map(fields, (item, index) => {

@@ -1,22 +1,34 @@
 import { Button } from "@/components/Button";
 import { Screen } from "@/components/Screen";
-import { Sidebar } from "@/components/Sidebar";
 import { TextInput } from "@/components/TextInput";
 import { jsonParse } from "@/util/format";
 import { useRouter } from "next/router";
 import { prisma } from "server/db/client";
 import { Checkbox, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { find } from "lodash";
+import { debounce, find } from "lodash";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { getPermission } from "@/permission/data";
+import { useEffect, useState } from "react";
+import { Requirement } from "@prisma/client";
 
 const SelectRequirements = (props: any) => {
-  const { requirements } = props;
   const router = useRouter();
-  const { id: projectId, tpId } = router.query;
-
+  const { id, tpId } = router.query;
+  const projectId = parseInt(`${id}`);
   // todo: Login session
   const userId = 1;
+  const editPermission = getPermission({
+    action: "edit",
+    role: ["OWNER"],
+    route: "test-plan",
+  });
+  const [requirements, setRequirements] = useState<Requirement[]>();
+
+  useEffect(() => {
+    getRequirements({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const updateReference = async (item: any) => {
     const res = await fetch("../../../../api/reference/update", {
@@ -30,9 +42,23 @@ const SelectRequirements = (props: any) => {
     }
   };
 
-  // todo: search
+  const getRequirements = async (item: any) => {
+    const res = await fetch("../../../../api/requirement/filter", {
+      method: "POST",
+      body: JSON.stringify({ projectId, ...item }),
+    });
+    if (res.ok) {
+      setRequirements(await res.json());
+    } else {
+      alert("Failed to get requirements");
+    }
+  };
+
+  const onSearch = debounce((text) => {
+    getRequirements({ search: text });
+  }, 150);
+
   const onPressBack = () => router.back();
-  const onSearch = (search: string) => {};
 
   const columns: ColumnsType<any> = [
     {
@@ -79,36 +105,35 @@ const SelectRequirements = (props: any) => {
   ];
 
   return (
-    <Screen>
-      <div className="flex flex-1">
-        <Sidebar />
-        <div className="flex-1 py-3 px-5">
-          <div className="flex flex-row justify-between items-center mb-3">
-            <p className="text-2xl font-bold italic">Select Requirements</p>
+    <Screen sidebar permission={editPermission}>
+      <div className="flex-1 py-3 px-5">
+        <div className="flex flex-row justify-between items-center mb-3">
+          <p className="text-2xl font-bold italic">Select Requirements</p>
 
-            <Button
-              text="Back"
-              className="mr-3 border-textPrimary"
-              icon={faArrowLeft}
-              type="invert"
-              textClassName="text-textPrimary"
-              onPress={onPressBack}
-            />
-          </div>
-          <div className="p-4 my-2 bg-primaryBg shadow">
-            <div className="flex flex-row justify-between items-center">
-              <div />
+          <Button
+            text="Back"
+            className="mr-3 border-textPrimary"
+            icon={faArrowLeft}
+            type="invert"
+            textClassName="text-textPrimary"
+            onPress={onPressBack}
+          />
+        </div>
+        <div className="p-4 my-2 bg-primaryBg shadow">
+          <div className="flex flex-row justify-between items-center">
+            <div />
+            <div>
               <TextInput
                 placeholder="Search"
-                onChange={(text) => onSearch(`${text}`)}
+                onChange={(e) => onSearch(e.currentTarget.value)}
               />
             </div>
-            <Table
-              columns={columns}
-              dataSource={requirements}
-              rowKey={(data) => `${data.id}`}
-            />
           </div>
+          <Table
+            columns={columns}
+            dataSource={requirements}
+            rowKey={(data) => `${data.id}`}
+          />
         </div>
       </div>
     </Screen>
@@ -123,11 +148,7 @@ export const getServerSideProps = async (context: any) => {
       projectId: { equals: parseInt(id) },
     },
     include: {
-      reference: {
-        include: {
-          testPlan: true,
-        },
-      },
+      reference: true,
     },
   });
   return {

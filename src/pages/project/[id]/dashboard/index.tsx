@@ -1,5 +1,4 @@
 import { Screen } from "@/components/Screen";
-import { Sidebar } from "@/components/Sidebar";
 import { jsonParse } from "@/util/format";
 import { useRouter } from "next/router";
 import { prisma } from "server/db/client";
@@ -43,20 +42,17 @@ const Dashboard = (props: any) => {
   const userId = 1;
 
   return (
-    <Screen>
-      <div className="flex flex-1">
-        <Sidebar />
-        <div className="flex-1 py-3 px-5">
-          <p className="text-2xl font-bold italic mb-5">Dashboard</p>
-          <div className="p-4 my-2 bg-primaryBg shadow">
-            <p className="text-xl font-bold">Overview</p>
-            <p className="text-xl font-bold">Log</p>
-            <Table
-              columns={columns}
-              dataSource={testResults}
-              rowKey={(data) => `${data.id}`}
-            />
-          </div>
+    <Screen sidebar>
+      <div className="flex-1 py-3 px-5">
+        <p className="text-2xl font-bold italic mb-5">Dashboard</p>
+        <div className="p-4 my-2 bg-primaryBg shadow">
+          <p className="text-xl font-bold">Overview</p>
+          <p className="text-xl font-bold">Log</p>
+          <Table
+            columns={columns}
+            dataSource={testResults}
+            rowKey={(data) => `${data.id}`}
+          />
         </div>
       </div>
     </Screen>

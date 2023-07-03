@@ -1,6 +1,6 @@
 import { Details } from "@/components/Details";
 import { Screen } from "@/components/Screen";
-import { Sidebar } from "@/components/Sidebar";
+import { getPermission } from "@/permission/data";
 import { formatDate, jsonParse } from "@/util/format";
 import { replace } from "lodash";
 import { useRouter } from "next/router";
@@ -19,6 +19,12 @@ const Requirements = (props: any) => {
 
   // todo: Login session
   const userId = 1;
+  const editPermission = getPermission({
+    action: "edit",
+    role: ["OWNER"],
+    route: "requirement",
+  });
+
   const [isEditing, setIsEditing] = useState(false);
   const { register, handleSubmit } = useForm();
 
@@ -44,51 +50,49 @@ const Requirements = (props: any) => {
     updateRequirement({ id: requirement?.id, ...data });
 
   return (
-    <Screen>
-      <div className="flex flex-1">
-        <Sidebar />
-        <Details
-          isEditing={isEditing}
-          editable
-          register={register}
-          title="Requirements"
-          onPressBack={onPressBack}
-          onPressCancel={onPressCancel}
-          onPressEdit={onPressEdit}
-          onPressSave={handleSubmit(onSubmit)}
-          data={data}
-          fields={[
-            {
-              render: ({ renderDetails }) => {
-                return (
-                  <div className="flex flex-row justify-between">
-                    {renderDetails({
-                      id: "title",
-                      title: "Title",
-                      placeholder: "Enter Title",
-                    })}
-                    {renderDetails({
-                      id: "reqCode",
-                      title: "Requirement Code",
-                      placeholder: "Enter Requirement Code",
-                    })}
-                  </div>
-                );
-              },
+    <Screen sidebar>
+      <Details
+        isEditing={isEditing}
+        editable={editPermission}
+        register={register}
+        title="Requirements"
+        onPressBack={onPressBack}
+        onPressCancel={onPressCancel}
+        onPressEdit={onPressEdit}
+        onPressSave={handleSubmit(onSubmit)}
+        data={data}
+        fields={[
+          {
+            render: ({ renderDetails }) => {
+              return (
+                <div className="flex flex-row justify-between">
+                  {renderDetails({
+                    id: "title",
+                    title: "Title",
+                    placeholder: "Enter Title",
+                  })}
+                  <div className="flex flex-1" />
+                  {renderDetails({
+                    id: "reqCode",
+                    title: "Requirement Code",
+                    placeholder: "Enter Requirement Code",
+                  })}
+                </div>
+              );
             },
-            {
-              id: "description",
-              title: "Description",
-              placeholder: "Enter Description",
-            },
-            {
-              id: "createdAt",
-              title: "Created At",
-              editable: false,
-            },
-          ]}
-        />
-      </div>
+          },
+          {
+            id: "description",
+            title: "Description",
+            placeholder: "Enter Description",
+          },
+          {
+            id: "createdAt",
+            title: "Created At",
+            editable: false,
+          },
+        ]}
+      />
     </Screen>
   );
 };
