@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { Dropdown, MenuProps } from "antd";
 import { find, map, without } from "lodash";
+import { signIn } from "next-auth/react";
 
 export const Header = (props: any) => {
   const router = useRouter();
