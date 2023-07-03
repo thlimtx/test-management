@@ -55,7 +55,7 @@ export const Sidebar = (props: any) => {
             );
           })}
         </div>
-        <div className="sidebar-exit" onClick={() => router.push("/")}>
+        <div className="sidebar-exit" onClick={() => router.push("/home")}>
           {renderSidebarItem({
             id: "exit",
             name: "Exit",
