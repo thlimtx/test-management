@@ -2,9 +2,9 @@ import { prisma } from "server/db/client";
 
 const handler = async (req: any, res: any) => {
   const { body } = req;
-  const { userId } = JSON.parse(body);
+  const { userEmail } = JSON.parse(body);
   const projects = await prisma.project.findMany({
-    where: { members: { some: { userId } } },
+    where: { members: { some: { user: { email: userEmail } } } },
   });
   return res.status(200).json(projects);
 };
