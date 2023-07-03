@@ -3,22 +3,22 @@ import { Screen } from "@/components/Screen";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
+import { useState } from "react";
 
 const Login = () => {
   const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit } = useForm();
+  const [errorMessage, setErrorMessage] = useState("");
+
   const onSubmit = async (data: any) => {
     const res = await signIn("credentials", {
       email: data.email,
       password: data.password,
       redirect: false,
     });
-    // todo: login response
+    res?.ok
+      ? router.push("/home")
+      : setErrorMessage("Invalid Login credentials");
   };
   return (
     <Screen>
@@ -26,7 +26,13 @@ const Login = () => {
         register={register}
         title="Login"
         fields={[
-          { id: "email", title: "Email", placeholder: "Email", type: "email" },
+          {
+            id: "email",
+            title: "Email",
+            placeholder: "Email",
+            type: "email",
+            register: { required: true },
+          },
           {
             id: "password",
             title: "Password",
@@ -39,6 +45,7 @@ const Login = () => {
           { text: "Signup", onPress: () => router.push("/auth/signup") },
           { text: "Login", onPress: handleSubmit(onSubmit) },
         ]}
+        error={errorMessage}
         // footer={
         //   <div className="text-right text-sm">
         //     Forgot password?{" "}

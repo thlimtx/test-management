@@ -11,4 +11,5 @@ export type FormProps = {
   onSubmit?: (data: any) => void;
   footer?: ReactNode;
   register?: UseFormRegister<FieldValues>;
+  error?: string;
 };
