@@ -1,3 +1,4 @@
+import { compare } from "bcrypt";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProviders from "next-auth/providers/credentials";
 import { prisma } from "server/db/client";
@@ -24,13 +25,26 @@ const authOptions: NextAuthOptions = {
         };
 
         const user = await prisma.user.findFirst({
-          where: { email, password },
+          where: { email },
+          include: { member: true },
         });
         if (!user) {
           throw new Error("Invalid login.");
         }
 
-        return { id: `${user.id}`, email: user.email, name: user.name };
+        const isPasswordValid = await compare(password, user.password);
+
+        if (!isPasswordValid) {
+          throw new Error("Invalid login.");
+        }
+
+        const authenticatedUser = {
+          id: `${user.id}`,
+          email: user.email,
+          name: `${user.name}`,
+          member: user.member,
+        };
+        return authenticatedUser;
       },
     }),
   ],
