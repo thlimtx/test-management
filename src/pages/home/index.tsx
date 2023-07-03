@@ -23,9 +23,11 @@ import { ColumnsType } from "antd/es/table";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { Member, Project } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import authOptions from "../api/auth/[...nextauth]";
 
 const Home = (props: any) => {
-  const userId = 1;
+  const userId = props?.user?.id;
   const router = useRouter();
   const { recentProjects, allProjects } = props;
   const [projects, setProjects] =
@@ -38,6 +40,7 @@ const Home = (props: any) => {
 
   useEffect(() => {
     getProjects({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const columns: ColumnsType<any> = [
@@ -209,7 +212,14 @@ const Home = (props: any) => {
 };
 
 export const getServerSideProps = async (context: any) => {
-  const userId = 1;
+  const session = await getServerSession(context.req, context.res, authOptions);
+  if (!session) {
+    return null;
+  }
+  const user = await prisma.user.findFirst({
+    where: { email: jsonParse(session).user.email },
+  });
+  const userId = user?.id;
   const recentProjects = await prisma.project.findMany({
     where: { members: { some: { userId } } },
     include: {
@@ -229,6 +239,7 @@ export const getServerSideProps = async (context: any) => {
     props: {
       recentProjects: jsonParse(recentProjects),
       allProjects: jsonParse(projects),
+      user: jsonParse(user),
     },
   };
 };

@@ -1,3 +1,4 @@
+import { jsonParse } from "@/util/format";
 import { compare } from "bcrypt";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProviders from "next-auth/providers/credentials";
@@ -38,18 +39,31 @@ const authOptions: NextAuthOptions = {
           throw new Error("Invalid login.");
         }
 
-        const authenticatedUser = {
+        return {
           id: `${user.id}`,
           email: user.email,
           name: `${user.name}`,
-          member: user.member,
         };
-        return authenticatedUser;
       },
     }),
   ],
   pages: {
     signIn: "/auth/login",
+  },
+  callbacks: {
+    session: ({ session, token }) => {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id,
+          // add any field needed for useSession
+        },
+      };
+    },
+    jwt: ({ token, user }) => {
+      return { ...token, ...user };
+    },
   },
 };
 
