@@ -28,9 +28,9 @@ export const Header = (props: any) => {
   useEffect(() => {
     if (
       !user &&
-      includes(router.asPath, "profile") &&
-      includes(router.asPath, "project") &&
-      includes(router.asPath, "home")
+      (includes(router.asPath, "profile") ||
+        includes(router.asPath, "project") ||
+        includes(router.asPath, "home"))
     ) {
       router.push("/auth/login");
     }

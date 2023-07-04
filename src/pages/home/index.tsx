@@ -214,7 +214,7 @@ const Home = (props: any) => {
 export const getServerSideProps = async (context: any) => {
   const session = await getServerSession(context.req, context.res, authOptions);
   if (!session) {
-    return null;
+    return { props: {} };
   }
   const user = await prisma.user.findFirst({
     where: { email: jsonParse(session).user.email },
