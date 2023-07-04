@@ -41,14 +41,14 @@ const TestPlans = (props: any) => {
   const testCases = filter(
     testCase,
     (item) =>
-      includes(toLower(item.testCaseCode), toLower(searchTC)) ||
+      includes(toLower(item.code), toLower(searchTC)) ||
       includes(toLower(item.title), toLower(searchTC))
   );
   const reqs = map(reference, (item) => item.req);
   const requirements = filter(
     reqs,
     (item) =>
-      includes(toLower(item.reqCode), toLower(searchReq)) ||
+      includes(toLower(item.code), toLower(searchReq)) ||
       includes(toLower(item.title), toLower(searchReq))
   );
 
@@ -158,13 +158,13 @@ const TestPlans = (props: any) => {
                     columns={[
                       {
                         title: "Code",
-                        key: "reqCode",
+                        key: "code",
                         width: 50,
                         render: (value) => (
                           <a
                             href={`/project/${projectId}/requirement/${value.id}`}
                           >
-                            {value.reqCode}
+                            {value.code}
                           </a>
                         ),
                       },
@@ -206,13 +206,13 @@ const TestPlans = (props: any) => {
                     columns={[
                       {
                         title: "Code",
-                        key: "testCaseCode",
+                        key: "code",
                         width: 50,
                         render: (value) => (
                           <a
                             href={`/project/${projectId}/test-plan/${id}/test-case/${value.id}`}
                           >
-                            {value.testCaseCode}
+                            {value.code}
                           </a>
                         ),
                       },

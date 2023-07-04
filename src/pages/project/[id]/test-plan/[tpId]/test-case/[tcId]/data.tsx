@@ -32,7 +32,7 @@ export const testCaseFields1 = [
           })}
           <div className="flex flex-1" />
           {renderDetails({
-            id: "testCaseCode",
+            id: "code",
             title: "Code",
             placeholder: "Enter Code",
           })}

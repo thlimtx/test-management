@@ -74,7 +74,7 @@ const Requirements = (props: any) => {
                   })}
                   <div className="flex flex-1" />
                   {renderDetails({
-                    id: "reqCode",
+                    id: "code",
                     title: "Requirement Code",
                     placeholder: "Enter Requirement Code",
                   })}

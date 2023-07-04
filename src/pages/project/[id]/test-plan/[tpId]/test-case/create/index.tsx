@@ -101,7 +101,7 @@ const CreateTestCase = (props: any) => {
         <div className="p-4 my-2 bg-primaryBg shadow">
           <div className="flex flex-row">
             <div className="flex-1 mr-3">{renderDetails("Title", "title")}</div>
-            {renderDetails("Test Case Code", "testCaseCode")}
+            {renderDetails("Test Case Code", "code")}
           </div>
           {renderDetails("Description", "description")}
           <div className="flex flex-row justify-between">

@@ -83,7 +83,7 @@ const CreateTestPlan = (props: any) => {
           </div>
         </div>
         <div className="p-4 my-2 bg-primaryBg shadow">
-          {renderDetails("Test Plan Code", "testPlanCode")}
+          {renderDetails("Test Plan Code", "code")}
           {renderDetails("Name", "title")}
           {renderDetails("Description", "description")}
         </div>

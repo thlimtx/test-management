@@ -60,7 +60,7 @@ export const TestPlanFields = [
           })}
           <div className="flex flex-1" />
           {renderDetails({
-            id: "testPlanCode",
+            id: "code",
             title: "Test Plan Code",
             placeholder: "Enter Test Plan Code",
           })}
