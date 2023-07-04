@@ -11,24 +11,26 @@ import { colors } from "@/util/color";
 import { getPermission } from "@/permission/data";
 import { useEffect, useState } from "react";
 import { TestPlan } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import authOptions from "@/pages/api/auth/[...nextauth]";
 
 const TestPlans = (props: any) => {
+  const { user } = props;
   const router = useRouter();
   const projectId = parseInt(`${router.query.id}`);
 
-  // todo: Login session
-  const userId = 1;
   const editPermission = getPermission({
     action: "edit",
-    role: ["OWNER"],
     route: "test-plan",
+    projectId,
+    user,
   });
   const [testPlans, setTestPlans] = useState<TestPlan[]>();
 
   useEffect(() => {
     getTestPlans({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [router]);
 
   const deleteTestPlan = async (item: any) => {
     const res = await fetch("../../api/test-plan/delete", {
@@ -158,7 +160,11 @@ const TestPlans = (props: any) => {
 };
 
 export const getServerSideProps = async (context: any) => {
-  // todo: Login session
+  const session = await getServerSession(context.req, context.res, authOptions);
+  const user = await prisma.user.findFirst({
+    where: { email: jsonParse(session).user.email },
+    include: { member: true },
+  });
   const { id } = context.query;
   const testPlans = await prisma.testPlan.findMany({
     where: { projectId: { equals: parseInt(id) } },
@@ -166,6 +172,7 @@ export const getServerSideProps = async (context: any) => {
   return {
     props: {
       testPlans: jsonParse(testPlans),
+      user: jsonParse(user),
     },
   };
 };

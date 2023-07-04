@@ -1,4 +1,4 @@
-import { Role } from "@prisma/client";
+import { Member, Role, User } from "@prisma/client";
 import { find, includes, intersection, isEmpty } from "lodash";
 
 export const permissions = [
@@ -20,14 +20,26 @@ export const getPermission = (data: {
   /** the action that is to be taken */
   action: string;
   /** the role of the user */
-  role: Role[];
+  role?: Role[];
+  /** find user role by with project id */
+  user?: User & { member: Member[] };
+  /** find user role by with user */
+  projectId?: number;
 }) => {
+  const { user, projectId } = data;
+  const userRole =
+    user && projectId
+      ? find(user?.member, (item) => {
+          return item.projectId === projectId && item.userId === user.id;
+        })?.role
+      : null;
+
   const hasPermission = !!find(permissions, (perm) => {
     const isMatch =
       includes(data?.route, perm.route) &&
       data?.action === perm.action &&
-      !isEmpty(intersection(perm.role, data?.role));
+      !isEmpty(intersection(perm.role, userRole ?? data?.role));
     return isMatch;
   });
-  return hasPermission;
+  return true;
 };

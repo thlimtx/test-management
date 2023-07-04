@@ -30,7 +30,7 @@ export const Button = (props: ButtonProps) => {
 
   return (
     <div
-      className={`flex flex-row items-center shadow ${
+      className={`flex flex-row items-center justify-center shadow ${
         colors.bg
       } border-primary border-2 px-3 py-1.5 cursor-pointer rounded ${
         isHover ? "opacity-50" : ""

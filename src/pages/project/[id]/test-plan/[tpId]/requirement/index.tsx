@@ -11,24 +11,26 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { getPermission } from "@/permission/data";
 import { useEffect, useState } from "react";
 import { Requirement } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import authOptions from "@/pages/api/auth/[...nextauth]";
 
 const SelectRequirements = (props: any) => {
+  const { user } = props;
   const router = useRouter();
   const { id, tpId } = router.query;
   const projectId = parseInt(`${id}`);
-  // todo: Login session
-  const userId = 1;
   const editPermission = getPermission({
     action: "edit",
-    role: ["OWNER"],
     route: "test-plan",
+    projectId,
+    user,
   });
   const [requirements, setRequirements] = useState<Requirement[]>();
 
   useEffect(() => {
     getRequirements({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [router]);
 
   const updateReference = async (item: any) => {
     const res = await fetch("../../../../api/reference/update", {
@@ -141,7 +143,11 @@ const SelectRequirements = (props: any) => {
 };
 
 export const getServerSideProps = async (context: any) => {
-  // todo: Login session
+  const session = await getServerSession(context.req, context.res, authOptions);
+  const user = await prisma.user.findFirst({
+    where: { email: jsonParse(session).user.email },
+    include: { member: true },
+  });
   const { id } = context.query;
   const requirements = await prisma.requirement.findMany({
     where: {
@@ -154,6 +160,7 @@ export const getServerSideProps = async (context: any) => {
   return {
     props: {
       requirements: jsonParse(requirements),
+      user: jsonParse(user),
     },
   };
 };

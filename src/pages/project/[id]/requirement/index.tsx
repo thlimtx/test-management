@@ -12,24 +12,26 @@ import { getPermission } from "@/permission/data";
 import { debounce } from "lodash";
 import { useEffect, useState } from "react";
 import { Requirement } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import authOptions from "@/pages/api/auth/[...nextauth]";
 
 const Requirements = (props: any) => {
+  const { user } = props;
   const router = useRouter();
   const projectId = parseInt(`${router.query.id}`);
 
-  // todo: Login session
-  const userId = 1;
   const editPermission = getPermission({
     action: "edit",
-    role: ["OWNER"],
     route: "requirement",
+    projectId,
+    user,
   });
   const [requirements, setRequirements] = useState<Requirement[]>();
 
   useEffect(() => {
     getRequirements({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [router]);
 
   const deleteRequirement = async (item: any) => {
     const res = await fetch("../../api/requirement/delete", {
@@ -139,6 +141,21 @@ const Requirements = (props: any) => {
       </div>
     </Screen>
   );
+};
+
+export const getServerSideProps = async (context: any) => {
+  const session = await getServerSession(context.req, context.res, authOptions);
+
+  const user = await prisma.user.findFirst({
+    where: { email: jsonParse(session).user.email },
+    include: { member: true },
+  });
+
+  return {
+    props: {
+      user: jsonParse(user),
+    },
+  };
 };
 
 export default Requirements;

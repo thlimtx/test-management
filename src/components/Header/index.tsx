@@ -5,14 +5,15 @@ import { Project } from "@prisma/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { Dropdown, MenuProps } from "antd";
-import { find, map, without } from "lodash";
+import { find, includes, map, without } from "lodash";
+import { signIn, useSession } from "next-auth/react";
 
 export const Header = (props: any) => {
   const router = useRouter();
   const projectId = router.query.id;
-  // TODO: Login session
-  const userId = 1;
-  const user = { id: 1, name: "thlim" };
+  const session = useSession();
+
+  const user = session.data?.user;
 
   const [projects, setProjects] = useState<Project[]>();
   const curProject = find(projects, (o) => `${o.id}` === projectId);
@@ -21,13 +22,26 @@ export const Header = (props: any) => {
   });
 
   useEffect(() => {
-    findProject(userId);
+    findProject(user?.email);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
+  useEffect(() => {
+    if (
+      session.status !== "loading" &&
+      !user &&
+      (includes(router.asPath, "profile") ||
+        includes(router.asPath, "project") ||
+        includes(router.asPath, "home"))
+    ) {
+      router.push("/auth/login");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   const findProject = async (item: any) => {
     const res = await fetch("/api/project/read", {
       method: "POST",
-      body: JSON.stringify({ userId: parseInt(item) }),
+      body: JSON.stringify({ userEmail: item }),
     });
     if (res.ok) {
       const data = await res.json();
@@ -68,7 +82,7 @@ export const Header = (props: any) => {
           </Dropdown>
         )}
         <span className="w-5" />
-        {userId ? (
+        {user ? (
           <div className="flex-1 flex flex-row items-center">
             <img src="https://picsum.photos/30" className="mr-2 rounded-full" />
             <p>{user.name}</p>
@@ -77,14 +91,15 @@ export const Header = (props: any) => {
           <div className="flex flex-row items-center">
             <Button
               text="Sign up"
-              className="mr-5 rounded-full"
+              className="mr-5 border-none shadow-none"
               type="invert"
-              onPress={() => router.push("/signup")}
+              onPress={() => router.push("/auth/signup")}
             />
             <Button
               text="Login"
-              className="rounded-full"
-              onPress={() => router.push("/login")}
+              className="border-none shadow-none"
+              type="invert"
+              onPress={() => signIn()}
             />
           </div>
         )}

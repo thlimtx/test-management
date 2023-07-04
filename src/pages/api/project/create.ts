@@ -22,6 +22,23 @@ const handler = async (req: any, res: any) => {
       updatedAt: new Date(),
     },
   });
+  if (!project) {
+    throw new Error("Failed to create project.");
+  }
+
+  const build = await prisma.build.create({
+    data: { projectId: project.id },
+  });
+  if (!build) {
+    throw new Error("Failed to create build.");
+  }
+  const deploy = await prisma.deploy.create({
+    data: { projectId: project.id },
+  });
+  if (!deploy) {
+    throw new Error("Failed to create deploy.");
+  }
+
   return res.status(200).json(project);
 };
 

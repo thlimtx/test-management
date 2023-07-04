@@ -7,8 +7,6 @@ const Project = () => {
   useEffect(() => {
     router && router.push(`/project/${router.query.id}/dashboard`);
   });
-  // todo: Login session
-  const userId = 1;
   return (
     <Screen>
       <div />

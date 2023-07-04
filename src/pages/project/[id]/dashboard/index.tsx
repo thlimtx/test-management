@@ -1,6 +1,5 @@
 import { Screen } from "@/components/Screen";
 import { jsonParse } from "@/util/format";
-import { useRouter } from "next/router";
 import { prisma } from "server/db/client";
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
@@ -34,12 +33,7 @@ const columns: ColumnsType<any> = [
 ];
 
 const Dashboard = (props: any) => {
-  const router = useRouter();
   const { testResults } = props;
-  console.log(props);
-
-  // todo: Login session
-  const userId = 1;
 
   return (
     <Screen sidebar>
@@ -60,8 +54,8 @@ const Dashboard = (props: any) => {
 };
 
 export const getServerSideProps = async (context: any) => {
-  // todo: Login session
   const { id } = context.query;
+
   const testResults = await prisma.testResult.findMany({
     where: { projectId: { equals: parseInt(id) } },
   });

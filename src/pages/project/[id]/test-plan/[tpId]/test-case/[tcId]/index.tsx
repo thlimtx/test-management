@@ -11,9 +11,11 @@ import { getPermission } from "@/permission/data";
 import { RenderProps } from "@/components/Details/props";
 import { colors } from "@/util/color";
 import { FormDropdown } from "@/components/FormDropdown";
+import { getServerSession } from "next-auth";
+import authOptions from "@/pages/api/auth/[...nextauth]";
 
 const TestCase = (props: any) => {
-  const { testCase } = props;
+  const { testCase, user } = props;
   const data = {
     ...testCase,
     createdAt: formatDate(testCase?.createdAt),
@@ -21,13 +23,13 @@ const TestCase = (props: any) => {
 
   const router = useRouter();
 
+  const projectId = parseInt(`${router.query.id}`);
   const { id } = data;
-  // todo: Login session
-  const userId = 1;
   const editPermission = getPermission({
     action: "edit",
-    role: ["OWNER"],
     route: "test-case",
+    projectId,
+    user,
   });
   const [isEditing, setIsEditing] = useState(false);
   const { register, handleSubmit, watch, setValue } = useForm();
@@ -122,7 +124,11 @@ const TestCase = (props: any) => {
 };
 
 export const getServerSideProps = async (context: any) => {
-  // todo: Login session
+  const session = await getServerSession(context.req, context.res, authOptions);
+  const user = await prisma.user.findFirst({
+    where: { email: jsonParse(session).user.email },
+    include: { member: true },
+  });
   const { tcId } = context.query;
   const testCase = await prisma.testCase.findFirst({
     where: { id: { equals: parseInt(tcId) } },
@@ -130,6 +136,7 @@ export const getServerSideProps = async (context: any) => {
   return {
     props: {
       testCase: jsonParse(testCase),
+      user: jsonParse(user),
     },
   };
 };

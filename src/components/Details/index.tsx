@@ -8,12 +8,12 @@ import {
   faPen,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import { has, isEmpty } from "lodash";
+import { get, has, isEmpty } from "lodash";
 
 export const Details = (props: DetailsProps) => {
   const {
     className,
-    data,
+    data = {},
     title,
     fields,
     register,
@@ -31,7 +31,7 @@ export const Details = (props: DetailsProps) => {
    */
   const renderDetails = (item: RenderDetailsProps) => {
     const { title, register: curRegister, renderText, ...rest } = item;
-    const dataValue = data[`${item.id}`];
+    const dataValue = get(data, `${item.id}`);
     return (
       <div className="flex flex-1 flex-col">
         <p className="text-fade text-xs my-1.5">{title}</p>

@@ -5,7 +5,7 @@ import map from "lodash/map";
 import { Box } from "../Box";
 
 export const Form = (props: FormProps) => {
-  const { title, fields, buttons, register, footer } = props;
+  const { title, fields, buttons, register, footer, error } = props;
 
   return (
     <Box title={title} type="form">
@@ -22,6 +22,8 @@ export const Form = (props: FormProps) => {
             </div>
           );
         })}
+        <p className="error text-sm">{error}</p>
+        {footer}
       </div>
       <div className="flex flex-row justify-end my-3">
         {map(buttons, (item, index) => {

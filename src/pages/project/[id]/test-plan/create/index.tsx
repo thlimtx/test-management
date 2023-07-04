@@ -6,8 +6,13 @@ import { useForm } from "react-hook-form";
 import { faFloppyDisk, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { replace } from "lodash";
 import { getPermission } from "@/permission/data";
+import { getServerSession } from "next-auth";
+import authOptions from "@/pages/api/auth/[...nextauth]";
+import { jsonParse } from "@/util/format";
+import { prisma } from "server/db/client";
 
 const CreateTestPlan = (props: any) => {
+  const { user } = props;
   const router = useRouter();
   const {
     register,
@@ -16,13 +21,11 @@ const CreateTestPlan = (props: any) => {
     formState: { errors },
   } = useForm();
   const projectId = parseInt(router.query.id as string);
-  const tpId = router.query.tpId;
-  // todo: Login session
-  const userId = 1;
   const editPermission = getPermission({
     action: "edit",
-    role: ["OWNER"],
     route: "test-plan",
+    projectId,
+    user,
   });
 
   const createTestPlan = async (item: any) => {
@@ -87,6 +90,20 @@ const CreateTestPlan = (props: any) => {
       </div>
     </Screen>
   );
+};
+
+export const getServerSideProps = async (context: any) => {
+  const session = await getServerSession(context.req, context.res, authOptions);
+  const user = await prisma.user.findFirst({
+    where: { email: jsonParse(session).user.email },
+    include: { member: true },
+  });
+
+  return {
+    props: {
+      user: jsonParse(user),
+    },
+  };
 };
 
 export default CreateTestPlan;

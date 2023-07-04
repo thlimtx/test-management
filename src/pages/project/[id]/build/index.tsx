@@ -8,19 +8,21 @@ import { useForm } from "react-hook-form";
 import { buildFields, buildLogColumns } from "./data";
 import { useState } from "react";
 import { getPermission } from "@/permission/data";
+import { getServerSession } from "next-auth";
+import authOptions from "@/pages/api/auth/[...nextauth]";
 
 const Build = (props: any) => {
-  const { build, buildLog } = props;
-  const { id } = build;
+  const { build, buildLog, user } = props;
+  const { id, projectId } = build ?? {};
 
   const router = useRouter();
   const { register, handleSubmit } = useForm();
 
-  // TODO: login session
   const editPermission = getPermission({
     action: "edit",
-    role: ["OWNER"],
     route: "build",
+    projectId,
+    user,
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -81,6 +83,12 @@ const Build = (props: any) => {
 
 export const getServerSideProps = async (context: any) => {
   const { id } = context.query;
+  const session = await getServerSession(context.req, context.res, authOptions);
+
+  const user = await prisma.user.findFirst({
+    where: { email: jsonParse(session).user.email },
+    include: { member: true },
+  });
   const build = await prisma.build.findFirst({
     where: { projectId: { equals: parseInt(id) } },
   });
@@ -93,6 +101,7 @@ export const getServerSideProps = async (context: any) => {
     props: {
       build: jsonParse(build),
       buildLog: jsonParse(buildLog),
+      user: jsonParse(user),
     },
   };
 };

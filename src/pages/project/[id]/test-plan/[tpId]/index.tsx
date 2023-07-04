@@ -14,9 +14,11 @@ import { useForm } from "react-hook-form";
 import { prisma } from "server/db/client";
 import { TestPlanFields, requirementsColumns, testCaseColumns } from "./data";
 import { getPermission } from "@/permission/data";
+import { getServerSession } from "next-auth";
+import authOptions from "@/pages/api/auth/[...nextauth]";
 
 const TestPlans = (props: any) => {
-  const { testPlan } = props;
+  const { testPlan, user } = props;
   const data = {
     ...testPlan,
     createdAt: formatDate(testPlan?.createdAt),
@@ -25,12 +27,11 @@ const TestPlans = (props: any) => {
   const router = useRouter();
 
   const { projectId, id, reference, testCase } = data;
-  // todo: Login session
-  const userId = 1;
   const editPermission = getPermission({
     action: "edit",
-    role: ["OWNER"],
     route: "test-plan",
+    projectId,
+    user,
   });
   const [isEditing, setIsEditing] = useState(false);
   const [searchReq, setSearchReq] = useState("");
@@ -231,7 +232,11 @@ const TestPlans = (props: any) => {
 };
 
 export const getServerSideProps = async (context: any) => {
-  // todo: Login session
+  const session = await getServerSession(context.req, context.res, authOptions);
+  const user = await prisma.user.findFirst({
+    where: { email: jsonParse(session).user.email },
+    include: { member: true },
+  });
   const { tpId } = context.query;
   const testPlan = await prisma.testPlan.findFirst({
     where: { id: { equals: parseInt(tpId) } },
@@ -247,6 +252,7 @@ export const getServerSideProps = async (context: any) => {
   return {
     props: {
       testPlan: jsonParse(testPlan),
+      user: jsonParse(user),
     },
   };
 };

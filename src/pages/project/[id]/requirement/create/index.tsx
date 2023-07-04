@@ -6,8 +6,13 @@ import { useForm } from "react-hook-form";
 import { faFloppyDisk, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { replace } from "lodash";
 import { getPermission } from "@/permission/data";
+import { getServerSession } from "next-auth";
+import authOptions from "@/pages/api/auth/[...nextauth]";
+import { prisma } from "server/db/client";
+import { jsonParse } from "@/util/format";
 
 const CreateRequirement = (props: any) => {
+  const { user } = props;
   const router = useRouter();
   const {
     register,
@@ -16,13 +21,11 @@ const CreateRequirement = (props: any) => {
     formState: { errors },
   } = useForm();
   const projectId = parseInt(router.query.id as string);
-  const reqId = router.query.reqId;
-  // todo: Login session
-  const userId = 1;
   const editPermission = getPermission({
     action: "edit",
-    role: ["OWNER"],
     route: "requirement",
+    projectId,
+    user,
   });
 
   const createRequirement = async (item: any) => {
@@ -87,6 +90,20 @@ const CreateRequirement = (props: any) => {
       </div>
     </Screen>
   );
+};
+
+export const getServerSideProps = async (context: any) => {
+  const session = await getServerSession(context.req, context.res, authOptions);
+  const user = await prisma.user.findFirst({
+    where: { email: jsonParse(session).user.email },
+    include: { member: true },
+  });
+
+  return {
+    props: {
+      user: jsonParse(user),
+    },
+  };
 };
 
 export default CreateRequirement;

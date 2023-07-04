@@ -7,22 +7,23 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { prisma } from "server/db/client";
+import { getServerSession } from "next-auth";
+import authOptions from "@/pages/api/auth/[...nextauth]";
 
 const Requirements = (props: any) => {
-  const { requirement } = props;
+  const { requirement, user } = props;
   const data = {
     ...requirement,
     createdAt: formatDate(requirement?.createdAt),
   };
-
   const router = useRouter();
+  const projectId = parseInt(`${router.query.id}`);
 
-  // todo: Login session
-  const userId = 1;
   const editPermission = getPermission({
     action: "edit",
-    role: ["OWNER"],
     route: "requirement",
+    projectId,
+    user,
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -98,7 +99,12 @@ const Requirements = (props: any) => {
 };
 
 export const getServerSideProps = async (context: any) => {
-  // todo: Login session
+  const session = await getServerSession(context.req, context.res, authOptions);
+  const user = await prisma.user.findFirst({
+    where: { email: jsonParse(session).user.email },
+    include: { member: true },
+  });
+
   const { reqId } = context.query;
   const requirement = await prisma.requirement.findFirst({
     where: { id: { equals: parseInt(reqId) } },
@@ -106,6 +112,7 @@ export const getServerSideProps = async (context: any) => {
   return {
     props: {
       requirement: jsonParse(requirement),
+      user: jsonParse(user),
     },
   };
 };
