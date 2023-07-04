@@ -13,7 +13,7 @@ import { has, isEmpty } from "lodash";
 export const Details = (props: DetailsProps) => {
   const {
     className,
-    data,
+    data = {},
     title,
     fields,
     register,

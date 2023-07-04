@@ -8,19 +8,21 @@ import { useForm } from "react-hook-form";
 import { deployFields, deployLogColumns } from "./data";
 import { useState } from "react";
 import { getPermission } from "@/permission/data";
+import { getServerSession } from "next-auth";
+import authOptions from "@/pages/api/auth/[...nextauth]";
 
 const Deploy = (props: any) => {
-  const { deploy, deployLog } = props;
-  const { id } = deploy;
+  const { deploy, deployLog, user } = props;
+  const { id, projectId } = deploy ?? {};
 
   const router = useRouter();
   const { register, handleSubmit } = useForm();
 
-  // TODO: login session
   const editPermission = getPermission({
     action: "edit",
-    role: ["OWNER"],
     route: "deploy",
+    projectId,
+    user,
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -81,6 +83,12 @@ const Deploy = (props: any) => {
 
 export const getServerSideProps = async (context: any) => {
   const { id } = context.query;
+  const session = await getServerSession(context.req, context.res, authOptions);
+
+  const user = await prisma.user.findFirst({
+    where: { email: jsonParse(session).user.email },
+    include: { member: true },
+  });
   const deploy = await prisma.deploy.findFirst({
     where: { projectId: { equals: parseInt(id) } },
   });
@@ -93,6 +101,7 @@ export const getServerSideProps = async (context: any) => {
     props: {
       deploy: jsonParse(deploy),
       deployLog: jsonParse(deployLog),
+      user: jsonParse(user),
     },
   };
 };

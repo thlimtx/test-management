@@ -24,7 +24,7 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 import { Member, Project } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import authOptions from "../api/auth/[...nextauth]";
+import authOptions from "@/pages/api/auth/[...nextauth]";
 
 const Home = (props: any) => {
   const userId = props?.user?.id;

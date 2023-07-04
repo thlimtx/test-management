@@ -5,7 +5,7 @@ import { Project } from "@prisma/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { Dropdown, MenuProps } from "antd";
-import { find, map, without } from "lodash";
+import { find, includes, map, without } from "lodash";
 import { signIn, useSession } from "next-auth/react";
 
 export const Header = (props: any) => {
@@ -13,7 +13,7 @@ export const Header = (props: any) => {
   const projectId = router.query.id;
   const session = useSession();
 
-  const user = session.data?.user ?? {};
+  const user = session.data?.user;
 
   const [projects, setProjects] = useState<Project[]>();
   const curProject = find(projects, (o) => `${o.id}` === projectId);
@@ -25,6 +25,17 @@ export const Header = (props: any) => {
     findProject(user?.email);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
+  useEffect(() => {
+    if (
+      !user &&
+      includes(router.asPath, "profile") &&
+      includes(router.asPath, "project") &&
+      includes(router.asPath, "home")
+    ) {
+      router.push("/auth/login");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   const findProject = async (item: any) => {
     const res = await fetch("/api/project/read", {
