@@ -83,7 +83,7 @@ const CreateRequirement = (props: any) => {
           </div>
         </div>
         <div className="p-4 my-2 bg-primaryBg shadow">
-          {renderDetails("Requirement Code", "reqCode")}
+          {renderDetails("Requirement Code", "code")}
           {renderDetails("Name", "title")}
           {renderDetails("Description", "description")}
         </div>

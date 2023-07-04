@@ -2,11 +2,11 @@ import { prisma } from "server/db/client";
 
 const handler = async (req: any, res: any) => {
   const { body } = req;
-  const { reqCode, title, description, projectId } = JSON.parse(body);
+  const { code, title, description, projectId } = JSON.parse(body);
 
   const requirement = await prisma.requirement.create({
     data: {
-      reqCode,
+      code,
       title,
       description,
       projectId: projectId,

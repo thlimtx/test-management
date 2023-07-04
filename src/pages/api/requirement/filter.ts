@@ -5,7 +5,7 @@ const handler = async (req: any, res: any) => {
   const { body } = req;
   const { projectId, search } = JSON.parse(body);
   const filter = search
-    ? { OR: getFilter({ reqCode: search, title: search }) }
+    ? { OR: getFilter({ code: search, title: search }) }
     : {};
   const requirement = await prisma.requirement.findMany({
     where: {
@@ -15,7 +15,7 @@ const handler = async (req: any, res: any) => {
     include: {
       reference: true,
     },
-    orderBy: { reqCode: "asc" },
+    orderBy: { code: "asc" },
   });
   return res.status(200).json(requirement);
 };

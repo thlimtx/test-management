@@ -2,12 +2,12 @@ import { prisma } from "server/db/client";
 
 const handler = async (req: any, res: any) => {
   const { body } = req;
-  const { id, testPlanCode, title, description, lastExecutedAt, status } =
+  const { id, code, title, description, lastExecutedAt, status } =
     JSON.parse(body);
 
   const testPlan = await prisma.testPlan.update({
     data: {
-      testPlanCode,
+      code,
       title,
       description,
       lastExecutedAt,

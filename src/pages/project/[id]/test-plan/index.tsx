@@ -71,11 +71,9 @@ const TestPlans = (props: any) => {
   const columns: ColumnsType<any> = [
     {
       title: "Code",
-      key: "testPlanCode",
+      key: "code",
       render: (value) => (
-        <a href={`/project/${projectId}/test-plan/${value.id}`}>
-          {value.testPlanCode}
-        </a>
+        <a href={`/project/${projectId}/test-plan/${value.id}`}>{value.code}</a>
       ),
     },
     {

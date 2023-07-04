@@ -9,8 +9,8 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  name      String?  @db.VarChar(255)
-  email     String   @db.VarChar(255)
+  name      String?
+  email     String   @unique
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -19,11 +19,11 @@ model User {
 
 model Project {
   id           Int           @id @default(autoincrement())
-  name         String?       @db.VarChar(50)
-  description  String?       @db.VarChar(255)
-  env          String?       @db.VarChar(255)
-  tools        String?       @db.VarChar(255)
-  version      String?       @db.VarChar(10)
+  name         String?
+  description  String?
+  env          String?
+  tools        String?
+  version      String?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @default(now()) @updatedAt
   members      Member[]
@@ -59,9 +59,9 @@ model Requirement {
   projectId Int
   project   Project @relation(fields: [projectId], references: [id])
 
-  reqCode     String      @unique
-  title       String?     @db.VarChar(50)
-  description String?     @db.VarChar(255)
+  code        String
+  title       String?
+  description String?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @default(now()) @updatedAt
   reference   Reference[]
@@ -71,9 +71,9 @@ model TestPlan {
   id             Int        @id @default(autoincrement())
   projectId      Int
   project        Project    @relation(fields: [projectId], references: [id])
-  testPlanCode   String     @unique
-  title          String?    @db.VarChar(50)
-  description    String?    @db.VarChar(255)
+  code           String
+  title          String?
+  description    String?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @default(now()) @updatedAt
   lastExecutedAt DateTime?
@@ -97,21 +97,21 @@ model TestCase {
   testPlanId Int
   testPlan   TestPlan @relation(fields: [testPlanId], references: [id])
 
-  testCaseCode   String       @unique
-  title          String?      @db.VarChar(50)
-  description    String?      @db.VarChar(255)
+  code           String
+  title          String?
+  description    String?
   type           TestType     @default(MANUAL)
   priority       TestPriority @default(LOW)
-  precondition   String?      @db.VarChar(255)
-  steps          String?      @db.VarChar(255)
-  data           String?      @db.VarChar(255)
-  expected       String?      @db.VarChar(255)
-  result         String?      @db.VarChar(255)
+  precondition   String?
+  steps          String?
+  data           String?
+  expected       String?
+  result         String?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
   lastExecutedAt DateTime?
   status         TestStatus   @default(PENDING)
-  script         String?      @db.VarChar(255)
+  script         String?
 }
 
 enum TestType {

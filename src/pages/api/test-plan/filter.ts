@@ -6,14 +6,14 @@ const handler = async (req: any, res: any) => {
   const { body } = req;
   const { projectId, search } = JSON.parse(body);
   const filter: Prisma.TestPlanWhereInput = search
-    ? { OR: getFilter({ testPlanCode: search, title: search }) }
+    ? { OR: getFilter({ code: search, title: search }) }
     : {};
   const testPlan = await prisma.testPlan.findMany({
     where: {
       projectId: { equals: projectId },
       ...filter,
     },
-    orderBy: { testPlanCode: "asc" },
+    orderBy: { code: "asc" },
   });
   return res.status(200).json(testPlan);
 };
