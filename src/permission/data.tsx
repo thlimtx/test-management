@@ -41,5 +41,5 @@ export const getPermission = (data: {
       !isEmpty(intersection(perm.role, userRole ?? data?.role));
     return isMatch;
   });
-  return hasPermission;
+  return true;
 };

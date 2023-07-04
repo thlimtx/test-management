@@ -2,6 +2,8 @@ import { Form } from "@/components/Form";
 import { Screen } from "@/components/Screen";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
+import { useSession } from "next-auth/react";
+import { get } from "lodash";
 
 const CreateProject = () => {
   const router = useRouter();
@@ -11,9 +13,9 @@ const CreateProject = () => {
     watch,
     formState: { errors },
   } = useForm();
-
-  // todo: Login session
-  const userId = 1;
+  const session = useSession();
+  const user = session.data?.user;
+  const userId = parseInt(`${get(user, "id")}`);
 
   const createProject = async (item: any) => {
     const res = await fetch("../api/project/create", {

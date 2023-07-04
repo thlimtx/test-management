@@ -19,20 +19,22 @@ import { capitalize, find, includes, isNull } from "lodash";
 import { Role, User } from "@prisma/client";
 import { getDropdownOptionsbyType } from "@/util/data";
 import { getPermission } from "@/permission/data";
+import { getServerSession } from "next-auth";
+import authOptions from "@/pages/api/auth/[...nextauth]";
 
 const Members = (props: any) => {
   // TODO: manage roles
-  const { members } = props;
+  const { members, user } = props;
 
   const router = useRouter();
   const projectId = parseInt(router.query.id as string);
 
-  // todo: Login session
-  const userId = 1;
+  const userId = user?.id;
   const editPermission = getPermission({
     action: "edit",
-    role: ["OWNER"],
     route: "members",
+    projectId,
+    user,
   });
   const roleOptions = getDropdownOptionsbyType(Role, [Role.OWNER]);
   const [foundUser, setFoundUser] = useState<User | null>();
@@ -230,8 +232,14 @@ const Members = (props: any) => {
 };
 
 export const getServerSideProps = async (context: any) => {
-  // todo: Login session
   const { id } = context.query;
+  const session = await getServerSession(context.req, context.res, authOptions);
+
+  const user = await prisma.user.findFirst({
+    where: { email: jsonParse(session).user.email },
+    include: { member: true },
+  });
+
   const members = await prisma.member.findMany({
     where: { projectId: { equals: parseInt(id) } },
     include: {
@@ -241,6 +249,7 @@ export const getServerSideProps = async (context: any) => {
   return {
     props: {
       members: jsonParse(members),
+      user: jsonParse(user),
     },
   };
 };

@@ -10,17 +10,22 @@ import { getDropdownOptionsbyType } from "@/util/data";
 import { TestPriority, TestStatus, TestType } from "@prisma/client";
 import { getPermission } from "@/permission/data";
 import { FormDropdown } from "@/components/FormDropdown";
+import { jsonParse } from "@/util/format";
+import { prisma } from "server/db/client";
+import { getServerSession } from "next-auth";
+import authOptions from "@/pages/api/auth/[...nextauth]";
 
 const CreateTestCase = (props: any) => {
+  const { user } = props;
   const router = useRouter();
   const { register, handleSubmit, watch, setValue } = useForm();
   const tpId = parseInt(router.query.tpId as string);
-  // todo: Login session
-  const userId = 1;
+  const projectId = parseInt(`${router.query.id}`);
   const editPermission = getPermission({
     action: "edit",
-    role: ["OWNER"],
     route: "test-case",
+    projectId,
+    user,
   });
 
   const testCasePriorityOptions = getDropdownOptionsbyType(TestPriority);
@@ -113,6 +118,20 @@ const CreateTestCase = (props: any) => {
       </div>
     </Screen>
   );
+};
+
+export const getServerSideProps = async (context: any) => {
+  const session = await getServerSession(context.req, context.res, authOptions);
+  const user = await prisma.user.findFirst({
+    where: { email: jsonParse(session).user.email },
+    include: { member: true },
+  });
+
+  return {
+    props: {
+      user: jsonParse(user),
+    },
+  };
 };
 
 export default CreateTestCase;
