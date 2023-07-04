@@ -22,12 +22,15 @@ const CreateProject = () => {
       method: "POST",
       body: JSON.stringify({ ...item, userId }),
     });
+    if (res.ok) {
+      router.push("/home");
+    } else {
+      alert("Failed to create project.");
+    }
   };
 
   const onSubmit = (data: any) => {
-    createProject(data)
-      .then(() => router.push("/home"))
-      .catch(() => alert("Failed to create project."));
+    createProject(data);
   };
 
   return (

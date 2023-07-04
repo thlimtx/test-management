@@ -17,11 +17,14 @@ const Signup = () => {
       method: "POST",
       body: JSON.stringify({ ...item }),
     });
+    if (res.ok) {
+      router.push("/home");
+    } else {
+      alert("Sign up failed.");
+    }
   };
   const onSubmit = (data: any) => {
-    createUser(data)
-      .then(() => router.push("/home"))
-      .catch(() => alert("Sign up failed."));
+    createUser(data);
   };
   return (
     <Screen>
