@@ -15,7 +15,7 @@ const handler = async (req: any, res: any) => {
     include: {
       user: true,
     },
-    orderBy: { updatedAt: "desc" },
+    orderBy: { user: { name: "asc" } },
   });
   return res.status(200).json(member);
 };
