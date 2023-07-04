@@ -36,7 +36,7 @@ export const Header = (props: any) => {
       router.push("/auth/login");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
+  }, [router, session]);
 
   const findProject = async (item: any) => {
     const res = await fetch("/api/project/read", {
