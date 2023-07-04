@@ -27,6 +27,7 @@ export const Header = (props: any) => {
   }, [projectId]);
   useEffect(() => {
     if (
+      session.status !== "loading" &&
       !user &&
       (includes(router.asPath, "profile") ||
         includes(router.asPath, "project") ||
