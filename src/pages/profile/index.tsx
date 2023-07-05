@@ -59,14 +59,18 @@ const Build = (props: any) => {
   const onSubmit = (data: any) => {
     updateProfileDetails({ id, ...data, image: file });
   };
+  const onBack = () => {
+    router.back();
+  };
 
   return (
-    <Screen sidebar>
+    <Screen>
       <Details
         isEditing={isEditing}
         editable
         register={register}
         title="Profile"
+        onPressBack={onBack}
         onPressCancel={onPressCancel}
         onPressEdit={onPressEdit}
         onPressSave={handleSubmit(onSubmit)}

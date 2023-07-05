@@ -40,14 +40,12 @@ body {
   height: calc(100% - var(--header-offset));
 }
 
-.sidebar-item:hover {
-  background-color: var(--primary-color);
-  color: white;
+.nav-item:hover {
+  color: var(--primary-color);
   cursor: pointer;
 }
-.sidebar-exit:hover {
-  background-color: rgb(243, 84, 84);
-  color: white;
+.nav-exit:hover {
+  color: rgb(243, 84, 84);
   cursor: pointer;
 }
 
