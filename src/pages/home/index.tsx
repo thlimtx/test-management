@@ -46,9 +46,10 @@ const Home = (props: any) => {
   const columns: ColumnsType<any> = [
     {
       title: "Name",
-      dataIndex: "name",
       key: "name",
-      render: (text) => <a>{text}</a>,
+      render: (value) => (
+        <a href={`/project/${value.id}/dashboard`}>{value.name}</a>
+      ),
     },
     {
       title: "Version",
@@ -109,7 +110,7 @@ const Home = (props: any) => {
   };
 
   const onPressProject = (id: any) => {
-    router.push(`/project/${id}`);
+    router.push(`/project/${id}/dashboard`);
   };
 
   return (
