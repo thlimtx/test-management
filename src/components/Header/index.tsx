@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { Dropdown, MenuProps } from "antd";
 import { find, includes, map, without } from "lodash";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 export const Header = (props: any) => {
   const router = useRouter();
@@ -20,6 +20,10 @@ export const Header = (props: any) => {
   const projectOptions = map(without(projects, curProject), (item) => {
     return { key: `${item?.id}`, label: `${item?.name}` };
   });
+  const profileOptions: MenuProps["items"] = [
+    { key: "profile", label: "Profile" },
+    { key: "logout", label: "Log out" },
+  ];
 
   useEffect(() => {
     findProject(user?.email);
@@ -52,7 +56,11 @@ export const Header = (props: any) => {
   };
 
   const onSelectProject: MenuProps["onClick"] = ({ key }) => {
-    router.push("/project/" + key);
+    router.push("/project/" + key + "/dashboard");
+  };
+  const onSelectProfile: MenuProps["onClick"] = ({ key }) => {
+    key === "profile" && router.push("/profile");
+    key === "logout" && signOut();
   };
 
   return (
@@ -83,10 +91,18 @@ export const Header = (props: any) => {
         )}
         <span className="w-5" />
         {user ? (
-          <div className="flex-1 flex flex-row items-center">
-            <img src="https://picsum.photos/30" className="mr-2 rounded-full" />
-            <p>{user.name}</p>
-          </div>
+          <Dropdown
+            menu={{ items: profileOptions, onClick: onSelectProfile }}
+            trigger={["click"]}
+          >
+            <div className="flex-1 flex flex-row items-center button">
+              <img
+                src="https://picsum.photos/30"
+                className="mr-2 rounded-full"
+              />
+              <p>{user.name}</p>
+            </div>
+          </Dropdown>
         ) : (
           <div className="flex flex-row items-center">
             <Button
