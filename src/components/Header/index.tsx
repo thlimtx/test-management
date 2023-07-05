@@ -26,9 +26,9 @@ export const Header = (props: any) => {
   ];
 
   useEffect(() => {
-    findProject(user?.email);
+    user && findProject(user?.email);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId]);
+  }, [projectId, user]);
   useEffect(() => {
     if (
       session.status !== "loading" &&

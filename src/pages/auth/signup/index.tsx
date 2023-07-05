@@ -26,6 +26,7 @@ const Signup = () => {
       });
       if (resLogin?.ok) {
         router.push("/home");
+      } else {
         alert("Login failed.");
       }
     } else {
