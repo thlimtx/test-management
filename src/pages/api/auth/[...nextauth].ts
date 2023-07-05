@@ -1,4 +1,3 @@
-import { jsonParse } from "@/util/format";
 import { compare } from "bcrypt";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProviders from "next-auth/providers/credentials";

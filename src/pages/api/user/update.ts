@@ -1,6 +1,4 @@
-import { hash } from "bcrypt";
 import { prisma } from "server/db/client";
-import fs from "fs";
 
 const handler = async (req: any, res: any) => {
   const { body } = req;
