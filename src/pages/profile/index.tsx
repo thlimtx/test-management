@@ -5,9 +5,12 @@ import { prisma } from "server/db/client";
 import { Details } from "@/components/Details";
 import { useForm } from "react-hook-form";
 import { profileFields } from "./data";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { getServerSession } from "next-auth";
 import authOptions from "@/pages/api/auth/[...nextauth]";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { Image } from "antd";
 
 const Build = (props: any) => {
   const { user } = props;
@@ -15,7 +18,7 @@ const Build = (props: any) => {
 
   const router = useRouter();
   const { register, handleSubmit } = useForm();
-
+  const inputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<any>();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -26,17 +29,35 @@ const Build = (props: any) => {
     });
     if (res.ok) {
       setIsEditing(false);
+      setFile(null);
       router.replace(router.asPath);
     } else {
       alert("Failed to update profile details");
     }
   };
 
-  const onPressCancel = () => setIsEditing(false);
-  const onPressEdit = () => setIsEditing(true);
+  const onPressCancel = () => {
+    setIsEditing(false);
+    setFile(null);
+  };
+  const onPressEdit = () => {
+    setIsEditing(true);
+    setFile(null);
+  };
+  const onChangeFile = (e: any) => {
+    const uploadedFile = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setFile(e?.target?.result);
+    };
+    reader.readAsDataURL(uploadedFile);
+  };
 
+  const onClickPic = () => {
+    inputRef?.current?.click();
+  };
   const onSubmit = (data: any) => {
-    updateProfileDetails({ id, ...data });
+    updateProfileDetails({ id, ...data, image: file });
   };
 
   return (
@@ -50,7 +71,39 @@ const Build = (props: any) => {
         onPressEdit={onPressEdit}
         onPressSave={handleSubmit(onSubmit)}
         data={user}
-        fields={[...profileFields]}
+        fields={[
+          {
+            render: ({ isEditing }) => {
+              return (
+                <div className="flex">
+                  <div
+                    className={`flex flex-row ${isEditing ? "button" : ""}`}
+                    onClick={isEditing ? onClickPic : () => {}}
+                  >
+                    <input
+                      className="hidden"
+                      ref={inputRef}
+                      id="file"
+                      name="file"
+                      type="file"
+                      onChange={onChangeFile}
+                    />
+                    <Image
+                      preview={!isEditing}
+                      src={file ?? user.image}
+                      alt="profile pic"
+                      width={100}
+                      height={100}
+                      className="mb-2 rounded-full object-cover"
+                    />
+                    {isEditing && <FontAwesomeIcon icon={faPenToSquare} />}
+                  </div>
+                </div>
+              );
+            },
+          },
+          ...profileFields,
+        ]}
       />
     </Screen>
   );

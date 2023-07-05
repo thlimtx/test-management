@@ -4,13 +4,13 @@ import fs from "fs";
 
 const handler = async (req: any, res: any) => {
   const { body } = req;
-  const { id, name, email } = JSON.parse(body);
-
+  const { id, name, email, image } = JSON.parse(body);
   const user = await prisma.user.update({
     where: { id },
     data: {
       name,
       email,
+      image,
       updatedAt: new Date(),
     },
   });
