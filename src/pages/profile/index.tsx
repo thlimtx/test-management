@@ -9,7 +9,7 @@ import { useRef, useState } from "react";
 import { getServerSession } from "next-auth";
 import authOptions from "@/pages/api/auth/[...nextauth]";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faCircleUser, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { Image } from "antd";
 
 const Build = (props: any) => {
@@ -88,14 +88,22 @@ const Build = (props: any) => {
                       type="file"
                       onChange={onChangeFile}
                     />
-                    <Image
-                      preview={!isEditing}
-                      src={file ?? user.image}
-                      alt="profile pic"
-                      width={100}
-                      height={100}
-                      className="mb-2 rounded-full object-cover"
-                    />
+                    {file || user.image ? (
+                      <Image
+                        preview={!isEditing}
+                        src={file ?? user.image}
+                        alt="profile pic"
+                        width={96}
+                        height={96}
+                        className="mb-2 rounded-full object-cover"
+                      />
+                    ) : (
+                      <FontAwesomeIcon
+                        icon={faCircleUser}
+                        size="6x"
+                        color="gray"
+                      />
+                    )}
                     {isEditing && <FontAwesomeIcon icon={faPenToSquare} />}
                   </div>
                 </div>

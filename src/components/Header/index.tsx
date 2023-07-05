@@ -3,8 +3,8 @@ import { Button } from "../Button";
 import { useEffect, useState } from "react";
 import { Project } from "@prisma/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
-import { Dropdown, MenuProps } from "antd";
+import { faChevronDown, faCircleUser } from "@fortawesome/free-solid-svg-icons";
+import { Dropdown, Image, MenuProps } from "antd";
 import { find, includes, map, without } from "lodash";
 import { signIn, signOut, useSession } from "next-auth/react";
 
@@ -96,10 +96,18 @@ export const Header = (props: any) => {
             trigger={["click"]}
           >
             <div className="flex-1 flex flex-row items-center button">
-              <img
-                src="https://picsum.photos/30"
-                className="mr-2 rounded-full"
-              />
+              {user.image ? (
+                <Image
+                  src={user.image}
+                  width={24}
+                  height={24}
+                  alt="profile picture"
+                  className="rounded-full object-cover"
+                />
+              ) : (
+                <FontAwesomeIcon icon={faCircleUser} size="2xl" color="gray" />
+              )}
+              <span className="w-2" />
               <p>{user.name}</p>
             </div>
           </Dropdown>

@@ -43,6 +43,7 @@ const authOptions: NextAuthOptions = {
           id: `${user.id}`,
           email: user.email,
           name: `${user.name}`,
+          image: user.image,
         };
       },
     }),
