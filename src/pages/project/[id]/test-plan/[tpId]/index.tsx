@@ -7,15 +7,126 @@ import { faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { filter, includes, map, replace, toLower } from "lodash";
+import {
+  capitalize,
+  filter,
+  get,
+  includes,
+  map,
+  replace,
+  toLower,
+} from "lodash";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { prisma } from "server/db/client";
-import { TestPlanFields, requirementsColumns, testCaseColumns } from "./data";
 import { getPermission } from "@/permission/data";
 import { getServerSession } from "next-auth";
 import authOptions from "@/pages/api/auth/[...nextauth]";
+import { colors } from "@/util/color";
+import { RenderProps } from "@/components/Details/props";
+
+const requirementsColumns: ColumnsType<any> = [
+  {
+    title: "Title",
+    dataIndex: "title",
+    key: "title",
+  },
+  {
+    title: "Description",
+    dataIndex: "description",
+    key: "description",
+  },
+];
+
+const testCaseColumns: ColumnsType<any> = [
+  {
+    title: "Title",
+    dataIndex: "title",
+    key: "title",
+  },
+  {
+    title: "Description",
+    dataIndex: "description",
+    key: "description",
+  },
+  {
+    title: "Last Executed",
+    dataIndex: "lastExecutedAt",
+    key: "lastExecutedAt",
+    render: (value) => formatDate(value),
+  },
+  {
+    title: "Status",
+    dataIndex: "status",
+    key: "status",
+    render: (value) => {
+      return (
+        <p style={{ color: get(colors, toLower(value)) }}>
+          {capitalize(value)}
+        </p>
+      );
+    },
+  },
+];
+
+const TestPlanFields = [
+  {
+    render: ({ renderDetails }: RenderProps) => {
+      return (
+        <div className="flex flex-row">
+          {renderDetails({
+            id: "title",
+            title: "Title",
+            placeholder: "Enter Title",
+          })}
+          <div className="flex flex-1" />
+          {renderDetails({
+            id: "code",
+            title: "Test Plan Code",
+            placeholder: "Enter Test Plan Code",
+          })}
+        </div>
+      );
+    },
+  },
+  {
+    id: "description",
+    title: "Description",
+    placeholder: "Enter Description",
+  },
+  {
+    render: ({ renderDetails, data }: RenderProps) => {
+      const statusColor = get(colors, toLower(data.status));
+      return (
+        <div className="flex flex-row justify-evenly">
+          {renderDetails({
+            id: "createdAt",
+            title: "Created At",
+            editable: false,
+          })}
+          {renderDetails({
+            id: "lastExecutedAt",
+            title: "Last Executed",
+            placeholder: "Enter Last Executed Date",
+            editable: false,
+          })}
+          <div
+            className={`flex flex-1 flex-col`}
+            style={{ color: statusColor }}
+          >
+            {renderDetails({
+              id: "status",
+              title: "Status",
+              editable: false,
+              renderText: (text: any) => capitalize(text),
+            })}
+          </div>
+        </div>
+      );
+    },
+  },
+];
 
 const TestPlans = (props: any) => {
   const { testPlan, user } = props;
