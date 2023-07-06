@@ -5,15 +5,65 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { prisma } from "server/db/client";
-import { memberColumns, projectFields } from "./data";
 import { Button } from "@/components/Button";
 import { TextInput } from "@/components/TextInput";
 import { Table } from "antd";
 import { getPermission } from "@/permission/data";
 import { Member, User } from "@prisma/client";
-import { debounce } from "lodash";
+import { capitalize, debounce, join, map } from "lodash";
 import { getServerSession } from "next-auth";
 import authOptions from "@/pages/api/auth/[...nextauth]";
+
+const projectFields = [
+  {
+    id: "name",
+    title: "Name",
+    placeholder: "Enter Name",
+  },
+  {
+    id: "description",
+    title: "Description",
+    placeholder: "Enter Description",
+  },
+  {
+    id: "version",
+    title: "Version",
+    placeholder: "Enter Version",
+  },
+  {
+    id: "env",
+    title: "Environment",
+    placeholder: "Enter Environment",
+  },
+  {
+    id: "tools",
+    title: "Tools",
+    placeholder: "Enter Tools",
+  },
+];
+
+const memberColumns = [
+  {
+    title: "Name",
+    key: "name",
+    render: (data: any) => data.user.name,
+  },
+  {
+    title: "Email",
+    key: "email",
+    render: (data: any) => data.user.email,
+  },
+  {
+    title: "Role",
+    key: "role",
+    render: (data: any) => {
+      return join(
+        map(data.role, (o) => capitalize(o)),
+        ", "
+      );
+    },
+  },
+];
 
 const ProjectDetails = (props: any) => {
   const { project, user } = props;

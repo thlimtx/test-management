@@ -1,15 +1,62 @@
 import { Screen } from "@/components/Screen";
-import { jsonParse } from "@/util/format";
+import { formatDate, formatDuration, jsonParse } from "@/util/format";
 import { useRouter } from "next/router";
 import { prisma } from "server/db/client";
 import { Table } from "antd";
 import { Details } from "@/components/Details";
 import { useForm } from "react-hook-form";
-import { buildFields, buildLogColumns } from "./data";
 import { useState } from "react";
 import { getPermission } from "@/permission/data";
 import { getServerSession } from "next-auth";
 import authOptions from "@/pages/api/auth/[...nextauth]";
+import { ColumnsType } from "antd/es/table";
+import { capitalize, get, toLower } from "lodash";
+import { colors } from "@/util/color";
+
+const buildFields = [
+  {
+    id: "description",
+    title: "Description",
+    placeholder: "Enter Description",
+  },
+  {
+    id: "script",
+    title: "Script",
+    placeholder: "Enter script",
+  },
+];
+
+const buildLogColumns: ColumnsType<any> = [
+  {
+    title: "ID",
+    key: "id",
+    dataIndex: "id",
+  },
+  {
+    title: "Duration (s)",
+    dataIndex: "duration",
+    key: "duration",
+    render: (value) => formatDuration(value),
+  },
+  {
+    title: "Date",
+    dataIndex: "createdAt",
+    key: "createdAt",
+    render: (value) => formatDate(value),
+  },
+  {
+    title: "Status",
+    dataIndex: "status",
+    key: "status",
+    render: (value) => {
+      return (
+        <p style={{ color: get(colors, toLower(value)) }}>
+          {capitalize(value)}
+        </p>
+      );
+    },
+  },
+];
 
 const Build = (props: any) => {
   const { build, buildLog, user } = props;

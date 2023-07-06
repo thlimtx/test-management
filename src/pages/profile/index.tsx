@@ -4,13 +4,25 @@ import { useRouter } from "next/router";
 import { prisma } from "server/db/client";
 import { Details } from "@/components/Details";
 import { useForm } from "react-hook-form";
-import { profileFields } from "./data";
 import { useRef, useState } from "react";
 import { getServerSession } from "next-auth";
 import authOptions from "@/pages/api/auth/[...nextauth]";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { Image } from "antd";
+
+const profileFields = [
+  {
+    id: "name",
+    title: "Name",
+    placeholder: "Enter Name",
+  },
+  {
+    id: "email",
+    title: "Email",
+    placeholder: "Enter email",
+  },
+];
 
 const Build = (props: any) => {
   const { user } = props;

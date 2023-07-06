@@ -4,7 +4,6 @@ import { jsonParse } from "@/util/format";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { prisma } from "server/db/client";
-import { memberColumns } from "./data";
 import { Button } from "@/components/Button";
 import {
   faChevronDown,
@@ -32,6 +31,19 @@ import { getPermission } from "@/permission/data";
 import { getServerSession } from "next-auth";
 import authOptions from "@/pages/api/auth/[...nextauth]";
 import { ColumnsType } from "antd/es/table";
+
+const memberColumns = [
+  {
+    title: "Name",
+    key: "name",
+    render: (data: any) => data.user.name,
+  },
+  {
+    title: "Email",
+    key: "email",
+    render: (data: any) => data.user.email,
+  },
+];
 
 const Members = (props: any) => {
   const { user } = props;
