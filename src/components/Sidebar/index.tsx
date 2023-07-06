@@ -43,9 +43,7 @@ export const Sidebar = (props: any) => {
             return (
               <div
                 key={index}
-                className={`sidebar-item ${
-                  isCurrentPage ? "text-primary" : ""
-                }`}
+                className={`nav-item ${isCurrentPage ? "text-primary" : ""}`}
                 onClick={() =>
                   router.push("/project/" + router.query.id + "/" + item.id)
                 }

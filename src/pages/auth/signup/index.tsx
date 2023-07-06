@@ -1,5 +1,6 @@
 import { Form } from "@/components/Form";
 import { Screen } from "@/components/Screen";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 
@@ -17,11 +18,23 @@ const Signup = () => {
       method: "POST",
       body: JSON.stringify({ ...item }),
     });
+    if (res.ok) {
+      const resLogin = await signIn("credentials", {
+        email: item.email,
+        password: item.password,
+        redirect: false,
+      });
+      if (resLogin?.ok) {
+        router.push("/home");
+      } else {
+        alert("Login failed.");
+      }
+    } else {
+      alert("Sign up failed.");
+    }
   };
   const onSubmit = (data: any) => {
-    createUser(data)
-      .then(() => router.push("/home"))
-      .catch(() => alert("Sign up failed."));
+    createUser(data);
   };
   return (
     <Screen>

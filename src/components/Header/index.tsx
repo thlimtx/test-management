@@ -3,10 +3,10 @@ import { Button } from "../Button";
 import { useEffect, useState } from "react";
 import { Project } from "@prisma/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
-import { Dropdown, MenuProps } from "antd";
-import { find, includes, map, without } from "lodash";
-import { signIn, useSession } from "next-auth/react";
+import { faChevronDown, faCircleUser } from "@fortawesome/free-solid-svg-icons";
+import { Dropdown, Image, MenuProps } from "antd";
+import { find, includes, isEmpty, map, without } from "lodash";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 export const Header = (props: any) => {
   const router = useRouter();
@@ -17,14 +17,21 @@ export const Header = (props: any) => {
 
   const [projects, setProjects] = useState<Project[]>();
   const curProject = find(projects, (o) => `${o.id}` === projectId);
-  const projectOptions = map(without(projects, curProject), (item) => {
-    return { key: `${item?.id}`, label: `${item?.name}` };
-  });
+  const projectOptions = map(
+    projectId ? without(projects, curProject) : projects,
+    (item) => {
+      return { key: `${item?.id}`, label: `${item?.name}` };
+    }
+  );
+  const profileOptions: MenuProps["items"] = [
+    { key: "profile", label: "Profile" },
+    { key: "logout", label: "Log out" },
+  ];
 
   useEffect(() => {
-    findProject(user?.email);
+    user && findProject(user?.email);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId]);
+  }, [projectId, user]);
   useEffect(() => {
     if (
       session.status !== "loading" &&
@@ -36,7 +43,7 @@ export const Header = (props: any) => {
       router.push("/auth/login");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
+  }, [router, session]);
 
   const findProject = async (item: any) => {
     const res = await fetch("/api/project/read", {
@@ -52,7 +59,11 @@ export const Header = (props: any) => {
   };
 
   const onSelectProject: MenuProps["onClick"] = ({ key }) => {
-    router.push("/project/" + key);
+    router.push("/project/" + key + "/dashboard");
+  };
+  const onSelectProfile: MenuProps["onClick"] = ({ key }) => {
+    key === "profile" && router.push("/profile");
+    key === "logout" && signOut();
   };
 
   return (
@@ -60,11 +71,23 @@ export const Header = (props: any) => {
       className={`fixed header-height mb-1 w-full shadow bg-primaryBg px-2 flex flex-row ${props.className}`}
       style={props.style}
     >
-      <div className="flex-1 flex flex-row px-2 items-center">
-        <img src="https://picsum.photos/30" />
+      <div className="flex-1 flex flex-row px-5 items-center">
+        <Image
+          src="https://picsum.photos/30"
+          preview={false}
+          width={30}
+          height={30}
+          alt="web icon"
+          onClick={() => router.push("/")}
+          className="object-cover"
+        />
+        <span className="w-10" />
+        <p className="nav-item" onClick={() => router.push("/home")}>
+          Home
+        </p>
       </div>
       <div className="flex flex-row mx-5">
-        {projectId && (
+        {!isEmpty(projectOptions) && (
           <Dropdown
             menu={{ items: projectOptions, onClick: onSelectProject }}
             trigger={["click"]}
@@ -74,7 +97,7 @@ export const Header = (props: any) => {
                 id="type"
                 className={`flex flex-row items-center button h-full`}
               >
-                <p>{curProject?.name}</p>
+                <p>{curProject?.name ?? "Select Project"}</p>
                 <span className="w-3" />
                 <FontAwesomeIcon icon={faChevronDown} size="sm" />
               </div>
@@ -83,10 +106,26 @@ export const Header = (props: any) => {
         )}
         <span className="w-5" />
         {user ? (
-          <div className="flex-1 flex flex-row items-center">
-            <img src="https://picsum.photos/30" className="mr-2 rounded-full" />
-            <p>{user.name}</p>
-          </div>
+          <Dropdown
+            menu={{ items: profileOptions, onClick: onSelectProfile }}
+            trigger={["click"]}
+          >
+            <div className="flex-1 flex flex-row items-center button">
+              {user.image ? (
+                <Image
+                  src={user.image}
+                  width={24}
+                  height={24}
+                  alt="profile picture"
+                  className="rounded-full object-cover"
+                />
+              ) : (
+                <FontAwesomeIcon icon={faCircleUser} size="2xl" color="gray" />
+              )}
+              <span className="w-2" />
+              <p>{user.name}</p>
+            </div>
+          </Dropdown>
         ) : (
           <div className="flex flex-row items-center">
             <Button

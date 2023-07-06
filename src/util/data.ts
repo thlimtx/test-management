@@ -1,4 +1,4 @@
-import { capitalize, filter, includes, map, mapValues } from "lodash";
+import { capitalize, filter, includes, map } from "lodash";
 
 /**
  * Get dropdown option data type from enum

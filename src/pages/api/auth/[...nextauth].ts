@@ -1,4 +1,3 @@
-import { jsonParse } from "@/util/format";
 import { compare } from "bcrypt";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProviders from "next-auth/providers/credentials";
@@ -19,6 +18,7 @@ const authOptions: NextAuthOptions = {
           placeholder: "Enter password",
         },
       },
+      // Authenticate the credentials from login with database
       authorize: async (credentials, req) => {
         const { email, password } = credentials as {
           email: string;
@@ -43,6 +43,7 @@ const authOptions: NextAuthOptions = {
           id: `${user.id}`,
           email: user.email,
           name: `${user.name}`,
+          image: user.image,
         };
       },
     }),

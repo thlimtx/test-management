@@ -159,6 +159,9 @@ const TestPlans = (props: any) => {
 
 export const getServerSideProps = async (context: any) => {
   const session = await getServerSession(context.req, context.res, authOptions);
+  if (!session) {
+    return { props: {} };
+  }
   const user = await prisma.user.findFirst({
     where: { email: jsonParse(session).user.email },
     include: { member: true },
