@@ -137,7 +137,6 @@ const Members = (props: any) => {
     const roles = includes(data.role, key)
       ? without(data.role, key)
       : uniq([...data.role, key]);
-    console.log({ roles });
     const { projectId, userId } = data;
     updateMember({ projectId, userId, role: roles });
   };
@@ -327,7 +326,9 @@ const Members = (props: any) => {
 
 export const getServerSideProps = async (context: any) => {
   const session = await getServerSession(context.req, context.res, authOptions);
-
+  if (!session) {
+    return { props: {} };
+  }
   const user = await prisma.user.findFirst({
     where: { email: jsonParse(session).user.email },
     include: { member: true },

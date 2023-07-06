@@ -92,10 +92,10 @@ const Build = (props: any) => {
                       type="file"
                       onChange={onChangeFile}
                     />
-                    {file || user.image ? (
+                    {file || user?.image ? (
                       <Image
                         preview={!isEditing}
-                        src={file ?? user.image}
+                        src={file ?? user?.image}
                         alt="profile pic"
                         width={96}
                         height={96}
@@ -123,7 +123,9 @@ const Build = (props: any) => {
 
 export const getServerSideProps = async (context: any) => {
   const session = await getServerSession(context.req, context.res, authOptions);
-
+  if (!session) {
+    return { props: {} };
+  }
   const user = await prisma.user.findFirst({
     where: { email: jsonParse(session).user.email },
     include: { member: true },

@@ -18,6 +18,7 @@ const authOptions: NextAuthOptions = {
           placeholder: "Enter password",
         },
       },
+      // Authenticate the credentials from login with database
       authorize: async (credentials, req) => {
         const { email, password } = credentials as {
           email: string;
