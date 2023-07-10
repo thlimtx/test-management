@@ -1,6 +1,7 @@
 import { compare } from "bcrypt";
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProviders from "next-auth/providers/credentials";
+import { env } from "process";
 import { prisma } from "server/db/client";
 
 const authOptions: NextAuthOptions = {
@@ -48,6 +49,7 @@ const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  secret: env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/auth/login",
   },
