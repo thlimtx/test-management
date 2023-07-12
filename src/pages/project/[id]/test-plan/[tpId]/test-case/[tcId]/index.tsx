@@ -109,14 +109,13 @@ const TestCase = (props: any) => {
           <div className="flex flex-row justify-between">
             {map(testCaseDropFields, (item) => {
               const { id, title, options } = item;
-              const value = watch(id);
+              const value = capitalize(watch(id) || get(data, id));
               const onSelect = (key: string, value?: string) =>
                 setValue(key, value);
-              console.log(data);
-
               return (
                 <FormDropdown
                   {...{ register, id, title, options, value, onSelect }}
+                  key={id}
                 />
               );
             })}
