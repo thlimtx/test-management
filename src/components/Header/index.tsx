@@ -7,6 +7,7 @@ import { faChevronDown, faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import { Dropdown, Image, MenuProps } from "antd";
 import { find, includes, isEmpty, map, without } from "lodash";
 import { signIn, signOut, useSession } from "next-auth/react";
+const logo = require("@/asset/icons/logo.png");
 
 export const Header = (props: any) => {
   const router = useRouter();
@@ -73,13 +74,12 @@ export const Header = (props: any) => {
     >
       <div className="flex-1 flex flex-row px-5 items-center">
         <Image
-          src="https://picsum.photos/30"
+          src={logo.default.src}
           preview={false}
           width={30}
-          height={30}
-          alt="web icon"
+          alt="logo"
           onClick={() => router.push("/")}
-          className="object-cover"
+          className="object-cover button"
         />
         <span className="w-10" />
         <p className="nav-item" onClick={() => router.push("/home")}>
