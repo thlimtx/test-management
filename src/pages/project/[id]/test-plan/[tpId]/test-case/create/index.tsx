@@ -62,6 +62,21 @@ const CreateTestCase = (props: any) => {
     );
   };
 
+  const renderTextArea = (title: string, id: string) => {
+    return (
+      <div>
+        <p className="text-fade text-xs mb-1.5">{title}</p>
+        <textarea
+          className="w-full border border-opacity-100 rounded-sm text-sm px-3 py-1.5"
+          rows={5}
+          id={id}
+          placeholder={`Enter ${title}`}
+          onChange={(e) => setValue(id, e.currentTarget.value)}
+        />
+      </div>
+    );
+  };
+
   const renderDropdown = (
     id: string,
     title: string,
@@ -103,15 +118,17 @@ const CreateTestCase = (props: any) => {
             <div className="flex-1 mr-3">{renderDetails("Title", "title")}</div>
             {renderDetails("Test Case Code", "code")}
           </div>
-          {renderDetails("Description", "description")}
+          {renderTextArea("Description", "description")}
           <div className="flex flex-row justify-between">
             {renderDropdown("type", "Type", testCaseTypeOptions)}
+            <span className="w-3" />
             {renderDropdown("priority", "Priority", testCasePriorityOptions)}
+            <span className="w-3" />
             {renderDropdown("status", "Status", testCaseStatusOptions)}
           </div>
           {renderDetails("Precondition", "precondition")}
-          {renderDetails("Steps", "steps")}
-          {renderDetails("Test Data", "data")}
+          {renderTextArea("Steps", "steps")}
+          {renderTextArea("Test Data", "data")}
           {renderDetails("Expected result", "expected")}
           {renderDetails("Test Script", "script")}
         </div>

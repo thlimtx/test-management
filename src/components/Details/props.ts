@@ -33,6 +33,10 @@ export type FieldItem = React.HTMLProps<HTMLInputElement> & {
    * Whether the field is editable
    */
   editable?: boolean;
+  /**
+   * Whether the field has multiple lines
+   */
+  multiline?: boolean;
 };
 
 export type DetailsProps = {

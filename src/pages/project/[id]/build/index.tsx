@@ -13,19 +13,6 @@ import { ColumnsType } from "antd/es/table";
 import { capitalize, get, toLower } from "lodash";
 import { colors } from "@/util/color";
 
-const buildFields = [
-  {
-    id: "description",
-    title: "Description",
-    placeholder: "Enter Description",
-  },
-  {
-    id: "script",
-    title: "Script",
-    placeholder: "Enter script",
-  },
-];
-
 const buildLogColumns: ColumnsType<any> = [
   {
     title: "ID",
@@ -63,7 +50,7 @@ const Build = (props: any) => {
   const { id, projectId } = build ?? {};
 
   const router = useRouter();
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
 
   const editPermission = getPermission({
     action: "edit",
@@ -106,7 +93,18 @@ const Build = (props: any) => {
         onPressSave={handleSubmit(onSubmit)}
         data={build}
         fields={[
-          ...buildFields,
+          {
+            id: "description",
+            title: "Description",
+            placeholder: "Enter Description",
+            multiline: true,
+            onChange: (e) => setValue("description", e.currentTarget.value),
+          },
+          {
+            id: "script",
+            title: "Script",
+            placeholder: "Enter script",
+          },
           {
             render: ({}) => {
               return (

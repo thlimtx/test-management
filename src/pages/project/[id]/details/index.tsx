@@ -14,34 +14,6 @@ import { capitalize, debounce, join, map } from "lodash";
 import { getServerSession } from "next-auth";
 import authOptions from "@/pages/api/auth/[...nextauth]";
 
-const projectFields = [
-  {
-    id: "name",
-    title: "Name",
-    placeholder: "Enter Name",
-  },
-  {
-    id: "description",
-    title: "Description",
-    placeholder: "Enter Description",
-  },
-  {
-    id: "version",
-    title: "Version",
-    placeholder: "Enter Version",
-  },
-  {
-    id: "env",
-    title: "Environment",
-    placeholder: "Enter Environment",
-  },
-  {
-    id: "tools",
-    title: "Tools",
-    placeholder: "Enter Tools",
-  },
-];
-
 const memberColumns = [
   {
     title: "Name",
@@ -76,7 +48,7 @@ const ProjectDetails = (props: any) => {
 
   const { id } = data;
   const [isEditing, setIsEditing] = useState(false);
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
   const [members, setMembers] = useState<(Member & { user: User })[]>();
 
   const editPermission = getPermission({
@@ -143,7 +115,33 @@ const ProjectDetails = (props: any) => {
         onPressSave={handleSubmit(onSubmit)}
         data={data}
         fields={[
-          ...projectFields,
+          {
+            id: "name",
+            title: "Name",
+            placeholder: "Enter Name",
+          },
+          {
+            id: "description",
+            title: "Description",
+            placeholder: "Enter Description",
+            multiline: true,
+            onChange: (e) => setValue("description", e.currentTarget.value),
+          },
+          {
+            id: "version",
+            title: "Version",
+            placeholder: "Enter Version",
+          },
+          {
+            id: "env",
+            title: "Environment",
+            placeholder: "Enter Environment",
+          },
+          {
+            id: "tools",
+            title: "Tools",
+            placeholder: "Enter Tools",
+          },
           {
             render: ({}) => {
               return (

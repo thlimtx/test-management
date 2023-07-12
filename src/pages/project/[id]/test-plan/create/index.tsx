@@ -14,12 +14,7 @@ import { prisma } from "server/db/client";
 const CreateTestPlan = (props: any) => {
   const { user } = props;
   const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
   const projectId = parseInt(router.query.id as string);
   const editPermission = getPermission({
     action: "edit",
@@ -85,7 +80,16 @@ const CreateTestPlan = (props: any) => {
         <div className="p-4 my-2 bg-primaryBg shadow">
           {renderDetails("Test Plan Code", "code")}
           {renderDetails("Name", "title")}
-          {renderDetails("Description", "description")}
+          <div>
+            <p className="text-fade text-xs">Description</p>
+            <textarea
+              className="w-full border border-opacity-100 rounded-sm text-sm px-3 py-1.5 my-2"
+              rows={5}
+              id="description"
+              placeholder="Enter Description"
+              onChange={(e) => setValue("description", e.currentTarget.value)}
+            />
+          </div>
         </div>
       </div>
     </Screen>

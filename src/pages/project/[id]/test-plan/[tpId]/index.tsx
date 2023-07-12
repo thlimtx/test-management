@@ -70,64 +70,6 @@ const testCaseColumns: ColumnsType<any> = [
   },
 ];
 
-const TestPlanFields = [
-  {
-    render: ({ renderDetails }: RenderProps) => {
-      return (
-        <div className="flex flex-row">
-          {renderDetails({
-            id: "title",
-            title: "Title",
-            placeholder: "Enter Title",
-          })}
-          <div className="flex flex-1" />
-          {renderDetails({
-            id: "code",
-            title: "Test Plan Code",
-            placeholder: "Enter Test Plan Code",
-          })}
-        </div>
-      );
-    },
-  },
-  {
-    id: "description",
-    title: "Description",
-    placeholder: "Enter Description",
-  },
-  {
-    render: ({ renderDetails, data }: RenderProps) => {
-      const statusColor = get(colors, toLower(data.status));
-      return (
-        <div className="flex flex-row justify-evenly">
-          {renderDetails({
-            id: "createdAt",
-            title: "Created At",
-            editable: false,
-          })}
-          {renderDetails({
-            id: "lastExecutedAt",
-            title: "Last Executed",
-            placeholder: "Enter Last Executed Date",
-            editable: false,
-          })}
-          <div
-            className={`flex flex-1 flex-col`}
-            style={{ color: statusColor }}
-          >
-            {renderDetails({
-              id: "status",
-              title: "Status",
-              editable: false,
-              renderText: (text: any) => capitalize(text),
-            })}
-          </div>
-        </div>
-      );
-    },
-  },
-];
-
 const TestPlans = (props: any) => {
   const { testPlan, user } = props;
   const data = {
@@ -147,7 +89,7 @@ const TestPlans = (props: any) => {
   const [isEditing, setIsEditing] = useState(false);
   const [searchReq, setSearchReq] = useState("");
   const [searchTC, setSearchTC] = useState("");
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
 
   const testCases = filter(
     testCase,
@@ -239,7 +181,64 @@ const TestPlans = (props: any) => {
         onPressSave={handleSubmit(onSubmit)}
         data={data}
         fields={[
-          ...TestPlanFields,
+          {
+            render: ({ renderDetails }: RenderProps) => {
+              return (
+                <div className="flex flex-row">
+                  {renderDetails({
+                    id: "title",
+                    title: "Title",
+                    placeholder: "Enter Title",
+                  })}
+                  <div className="flex flex-1" />
+                  {renderDetails({
+                    id: "code",
+                    title: "Test Plan Code",
+                    placeholder: "Enter Test Plan Code",
+                  })}
+                </div>
+              );
+            },
+          },
+          {
+            id: "description",
+            title: "Description",
+            placeholder: "Enter Description",
+            multiline: true,
+            onChange: (e) => setValue("description", e.currentTarget.value),
+          },
+          {
+            render: ({ renderDetails, data }: RenderProps) => {
+              const statusColor = get(colors, toLower(data.status));
+              return (
+                <div className="flex flex-row justify-evenly">
+                  {renderDetails({
+                    id: "createdAt",
+                    title: "Created At",
+                    editable: false,
+                  })}
+                  {renderDetails({
+                    id: "lastExecutedAt",
+                    title: "Last Executed",
+                    placeholder: "Enter Last Executed Date",
+                    editable: false,
+                  })}
+                  <div
+                    className={`flex flex-1 flex-col`}
+                    style={{ color: statusColor }}
+                  >
+                    {renderDetails({
+                      id: "status",
+                      title: "Status",
+                      editable: false,
+                      renderText: (text: any) => capitalize(text),
+                    })}
+                  </div>
+                </div>
+              );
+            },
+          },
+
           {
             render: ({}) => {
               return (

@@ -30,20 +30,38 @@ export const Details = (props: DetailsProps) => {
    * @param item Each item in field props
    */
   const renderDetails = (item: RenderDetailsProps) => {
-    const { title, register: curRegister, renderText, ...rest } = item;
+    const {
+      title,
+      register: curRegister,
+      renderText,
+      onChange,
+      multiline,
+      ...rest
+    } = item;
     const dataValue = get(data, `${item.id}`);
     return (
       <div className="flex flex-1 flex-col">
         <p className="text-fade text-xs my-1.5">{title}</p>
         {editable && isEditing && item.editable !== false ? (
-          <TextInput
-            defaultValue={dataValue}
-            {...rest}
-            register={register}
-            registerOptions={curRegister}
-          />
+          multiline ? (
+            <textarea
+              className="w-full border border-opacity-100 rounded-sm text-sm px-3 py-1.5"
+              rows={5}
+              placeholder="Enter Description"
+              id="description"
+              defaultValue={data?.description}
+              onChange={(e) => onChange && onChange(e as any)}
+            />
+          ) : (
+            <TextInput
+              defaultValue={dataValue}
+              {...rest}
+              register={register}
+              registerOptions={curRegister}
+            />
+          )
         ) : (
-          <p>
+          <p className="whitespace-pre-line">
             {renderText
               ? renderText(dataValue)
               : isEmpty(dataValue)
