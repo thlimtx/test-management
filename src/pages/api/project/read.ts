@@ -5,6 +5,7 @@ const handler = async (req: any, res: any) => {
   const { userEmail } = JSON.parse(body);
   const projects = await prisma.project.findMany({
     where: { members: { some: { user: { email: userEmail } } } },
+    orderBy: { updatedAt: "desc" },
   });
   return res.status(200).json(projects);
 };
