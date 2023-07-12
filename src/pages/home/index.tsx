@@ -48,7 +48,9 @@ const Home = (props: any) => {
       title: "Name",
       key: "name",
       render: (value) => (
-        <a href={`/project/${value.id}/dashboard`}>{value.name}</a>
+        <a onClick={() => router.push(`/project/${value.id}/dashboard`)}>
+          {value.name}
+        </a>
       ),
     },
     {

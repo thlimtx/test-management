@@ -67,7 +67,11 @@ const SelectRequirements = (props: any) => {
       title: "Code",
       key: "code",
       render: (value) => (
-        <a href={`/project/${projectId}/requirement/${value.id}`}>
+        <a
+          onClick={() =>
+            router.push(`/project/${projectId}/requirement/${value.id}`)
+          }
+        >
           {value.code}
         </a>
       ),

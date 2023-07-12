@@ -73,7 +73,13 @@ const TestPlans = (props: any) => {
       title: "Code",
       key: "code",
       render: (value) => (
-        <a href={`/project/${projectId}/test-plan/${value.id}`}>{value.code}</a>
+        <a
+          onClick={() =>
+            router.push(`/project/${projectId}/test-plan/${value.id}`)
+          }
+        >
+          {value.code}
+        </a>
       ),
     },
     {

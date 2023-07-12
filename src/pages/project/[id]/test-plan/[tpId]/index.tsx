@@ -272,7 +272,11 @@ const TestPlans = (props: any) => {
                         width: 50,
                         render: (value) => (
                           <a
-                            href={`/project/${projectId}/requirement/${value.id}`}
+                            onClick={() =>
+                              router.push(
+                                `/project/${projectId}/requirement/${value.id}`
+                              )
+                            }
                           >
                             {value.code}
                           </a>
@@ -320,7 +324,11 @@ const TestPlans = (props: any) => {
                         width: 50,
                         render: (value) => (
                           <a
-                            href={`/project/${projectId}/test-plan/${id}/test-case/${value.id}`}
+                            onClick={() =>
+                              router.push(
+                                `/project/${projectId}/test-plan/${id}/test-case/${value.id}`
+                              )
+                            }
                           >
                             {value.code}
                           </a>
