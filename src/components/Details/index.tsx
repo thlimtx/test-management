@@ -61,13 +61,13 @@ export const Details = (props: DetailsProps) => {
             />
           )
         ) : (
-          <p className="whitespace-pre-line">
+          <div className="whitespace-pre-line">
             {renderText
               ? renderText(dataValue)
               : isEmpty(dataValue)
               ? "-"
               : dataValue}
-          </p>
+          </div>
         )}
       </div>
     );

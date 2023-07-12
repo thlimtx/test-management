@@ -126,11 +126,16 @@ const TestCase = (props: any) => {
               id: "type",
               title: "Type",
               editable: false,
+              renderText: (text: any) => capitalize(text),
             })}
             {renderDetails({
               id: "priority",
               title: "Priority",
               editable: false,
+              renderText: (text: any) => {
+                const statusColor = get(colors, toLower(data.priority));
+                return <p style={{ color: statusColor }}>{capitalize(text)}</p>;
+              },
             })}
             <div
               className={`flex flex-1 flex-col`}
