@@ -152,8 +152,10 @@ model Build {
   projectId   Int        @unique
   project     Project    @relation(fields: [projectId], references: [id])
   description String?
-  script      String?
   log         BuildLog[]
+  runEndpoint String?
+  getEndpoint String?
+  token       String?
 }
 
 model BuildLog {
@@ -171,8 +173,10 @@ model Deploy {
   projectId   Int         @unique
   project     Project     @relation(fields: [projectId], references: [id])
   description String?
-  script      String?
   log         DeployLog[]
+  runEndpoint String?
+  getEndpoint String?
+  token       String?
 }
 
 model DeployLog {
