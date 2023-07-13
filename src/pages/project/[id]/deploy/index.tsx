@@ -5,25 +5,31 @@ import { prisma } from "server/db/client";
 import { Table } from "antd";
 import { Details } from "@/components/Details";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getPermission } from "@/permission/data";
 import { getServerSession } from "next-auth";
 import authOptions from "@/pages/api/auth/[...nextauth]";
 import { ColumnsType } from "antd/es/table";
-import { capitalize, get, toLower } from "lodash";
+import { capitalize, find, get, isArray, toLower } from "lodash";
 import { colors } from "@/util/color";
+import moment from "moment";
 
 const deployLogColumns: ColumnsType<any> = [
   {
     title: "ID",
     key: "id",
-    dataIndex: "id",
+    dataIndex: "uid",
   },
   {
     title: "Duration (s)",
-    dataIndex: "duration",
     key: "duration",
-    render: (value) => formatDuration(value),
+    render: (value) => {
+      return (
+        formatDuration(moment(value.ready).diff(value.buildingAt))
+          .split(".")[0]
+          .replace(":", "m") + "s"
+      );
+    },
   },
   {
     title: "Date",
@@ -33,12 +39,11 @@ const deployLogColumns: ColumnsType<any> = [
   },
   {
     title: "Status",
-    dataIndex: "status",
     key: "status",
     render: (value) => {
       return (
-        <p style={{ color: get(colors, toLower(value)) }}>
-          {capitalize(value)}
+        <p style={{ color: get(colors, toLower(value.state)) }}>
+          {capitalize(value.state)}
         </p>
       );
     },
@@ -46,7 +51,7 @@ const deployLogColumns: ColumnsType<any> = [
 ];
 
 const Deploy = (props: any) => {
-  const { deploy, deployLog, user } = props;
+  const { deploy, user } = props;
   const { id, projectId } = deploy ?? {};
 
   const router = useRouter();
@@ -60,6 +65,12 @@ const Deploy = (props: any) => {
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [deployLogs, setDeployLogs] = useState<any>();
+
+  useEffect(() => {
+    getDeploymentLog({ projectId });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const updateProjectDetails = async (item: any) => {
     const res = await fetch("../../api/deploy/update", {
@@ -74,7 +85,18 @@ const Deploy = (props: any) => {
     }
   };
 
-  // const onPressBack = () => router.back();
+  const getDeploymentLog = async (item: any) => {
+    const res = await fetch("/api/deploy/log", {
+      method: "POST",
+      body: JSON.stringify({ projectId, ...item }),
+    });
+    if (res.ok) {
+      setDeployLogs(await res.json());
+    } else {
+      alert("Failed to get deployment log");
+    }
+  };
+
   const onPressCancel = () => setIsEditing(false);
   const onPressEdit = () => setIsEditing(true);
   const onSubmit = (data: any) => {
@@ -101,9 +123,35 @@ const Deploy = (props: any) => {
             onChange: (e) => setValue("description", e.currentTarget.value),
           },
           {
-            id: "script",
-            title: "Script",
-            placeholder: "Enter script",
+            id: "token",
+            title: "Token",
+            placeholder: "Enter token",
+            type: "password",
+            render: ({ renderDetails }) =>
+              renderDetails({
+                id: "token",
+                title: "Token",
+                placeholder: "Enter token",
+                type: "password",
+                renderText: (text) => (
+                  <input
+                    className="bg-primaryBg"
+                    type="password"
+                    value={text}
+                    disabled
+                  />
+                ),
+              }),
+          },
+          {
+            id: "runEndpoint",
+            title: "Deploy Endpoint",
+            placeholder: "Enter deployment endpoint",
+          },
+          {
+            id: "getEndpoint",
+            title: "Deployment Log Endpoint",
+            placeholder: "Enter deployment log endpoint",
           },
           {
             render: ({}) => {
@@ -113,8 +161,16 @@ const Deploy = (props: any) => {
 
                   <Table
                     columns={[...deployLogColumns]}
-                    dataSource={deployLog}
-                    rowKey={(data) => `${data.userId}`}
+                    dataSource={
+                      // Vercel directory
+                      deployLogs?.deployments ??
+                      (find(deployLogs, (value) =>
+                        isArray(value)
+                      ) as Array<any>) ??
+                      []
+                    }
+                    pagination={{ pageSize: 10 }}
+                    rowKey={(data) => `${data.uid}`}
                   />
                 </div>
               );
@@ -139,15 +195,15 @@ export const getServerSideProps = async (context: any) => {
   const deploy = await prisma.deploy.findFirst({
     where: { projectId: { equals: parseInt(id) } },
   });
-  const deployLog =
-    deploy &&
-    (await prisma.deployLog.findMany({
-      where: { deployId: { equals: deploy.id } },
-    }));
+  // const deployLog =
+  //   deploy &&
+  //   (await prisma.deployLog.findMany({
+  //     where: { deployId: { equals: deploy.id } },
+  //   }));
   return {
     props: {
       deploy: jsonParse(deploy),
-      deployLog: jsonParse(deployLog),
+      // deployLog: jsonParse(deployLog),
       user: jsonParse(user),
     },
   };

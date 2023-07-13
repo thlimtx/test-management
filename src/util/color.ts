@@ -1,4 +1,5 @@
 export const colors = {
+  ready: "lightgreen",
   passed: "lightgreen",
   pending: "orange",
   failed: "red",
