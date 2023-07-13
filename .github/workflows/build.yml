@@ -14,16 +14,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: "11"
-
       - name: Install dependancies
         run: npm install
 
       - name: Build project
         run: npm run build
-
-      - name: Build and Test
-        run: mvn clean install
