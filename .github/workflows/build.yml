@@ -1,4 +1,4 @@
-name: Java Maven Build
+name: Build Next.js webapp
 
 on:
   push:
@@ -11,17 +11,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
           java-version: "11"
-          distribution: "temurin"
-          maven-version: "3.8.4"
 
-      - name: Check Java and Maven versions
-        run: |
-          java -version
-          mvn --version
+      - name: Install dependancies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
 
       - name: Build and Test
         run: mvn clean install
