@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { prisma } from "server/db/client";
 import { getPermission } from "@/permission/data";
-import { RenderProps } from "@/components/Details/props";
+import { FieldItem, RenderProps } from "@/components/Details/props";
 import { colors } from "@/util/color";
 import { FormDropdown } from "@/components/FormDropdown";
 import { getServerSession } from "next-auth";
@@ -30,86 +30,6 @@ export const testCaseDropFields = [
     id: "status",
     title: "Status",
     options: getDropdownOptionsbyType(TestStatus),
-  },
-];
-
-const testCaseFields1 = [
-  {
-    render: ({ renderDetails }: RenderProps) => {
-      return (
-        <div className="flex flex-row">
-          {renderDetails({
-            id: "title",
-            title: "Title",
-            placeholder: "Enter Title",
-          })}
-          <div className="flex flex-1" />
-          {renderDetails({
-            id: "code",
-            title: "Code",
-            placeholder: "Enter Code",
-          })}
-        </div>
-      );
-    },
-  },
-  {
-    id: "description",
-    title: "Description",
-    placeholder: "Enter Description",
-  },
-];
-
-const testCaseFields2 = [
-  {
-    render: ({ renderDetails }: RenderProps) => {
-      return (
-        <div className="flex flex-row justify-evenly">
-          {renderDetails({
-            id: "createdAt",
-            title: "Created At",
-            editable: false,
-          })}
-          {renderDetails({
-            id: "lastExecutedAt",
-            title: "Last Executed",
-            placeholder: "Enter Last Executed Date",
-            editable: false,
-          })}
-          <div className="flex flex-1"></div>
-        </div>
-      );
-    },
-  },
-  {
-    id: "precondition",
-    title: "Precondition",
-    placeholder: "Enter Precondition",
-  },
-  {
-    id: "steps",
-    title: "Steps",
-    placeholder: "Enter Steps",
-  },
-  {
-    id: "data",
-    title: "Data",
-    placeholder: "Enter Test Data",
-  },
-  {
-    id: "expected",
-    title: "Expected Result",
-    placeholder: "Enter Expected Result",
-  },
-  {
-    id: "script",
-    title: "Test Script",
-    placeholder: "Enter Test Script",
-  },
-  {
-    id: "result",
-    title: "Actual Result",
-    placeholder: "Enter Actual Result",
   },
 ];
 
@@ -155,8 +75,33 @@ const TestCase = (props: any) => {
     updateTestCase({ id, ...data });
   };
 
-  const testCaseFields = [
-    ...testCaseFields1,
+  const testCaseFields: FieldItem[] = [
+    {
+      render: ({ renderDetails }: RenderProps) => {
+        return (
+          <div className="flex flex-row">
+            {renderDetails({
+              id: "title",
+              title: "Title",
+              placeholder: "Enter Title",
+            })}
+            <div className="flex flex-1" />
+            {renderDetails({
+              id: "code",
+              title: "Code",
+              placeholder: "Enter Code",
+            })}
+          </div>
+        );
+      },
+    },
+    {
+      id: "description",
+      title: "Description",
+      placeholder: "Enter Description",
+      multiline: true,
+      onChange: (e) => setValue("description", e.currentTarget.value),
+    },
     {
       render: ({ renderDetails, data, isEditing }: RenderProps) => {
         const statusColor = get(colors, toLower(data.status));
@@ -164,12 +109,13 @@ const TestCase = (props: any) => {
           <div className="flex flex-row justify-between">
             {map(testCaseDropFields, (item) => {
               const { id, title, options } = item;
-              const value = watch(id);
+              const value = capitalize(watch(id) || get(data, id));
               const onSelect = (key: string, value?: string) =>
                 setValue(key, value);
               return (
                 <FormDropdown
                   {...{ register, id, title, options, value, onSelect }}
+                  key={id}
                 />
               );
             })}
@@ -180,11 +126,16 @@ const TestCase = (props: any) => {
               id: "type",
               title: "Type",
               editable: false,
+              renderText: (text: any) => capitalize(text),
             })}
             {renderDetails({
               id: "priority",
               title: "Priority",
               editable: false,
+              renderText: (text: any) => {
+                const statusColor = get(colors, toLower(data.priority));
+                return <p style={{ color: statusColor }}>{capitalize(text)}</p>;
+              },
             })}
             <div
               className={`flex flex-1 flex-col`}
@@ -201,7 +152,60 @@ const TestCase = (props: any) => {
         );
       },
     },
-    ...testCaseFields2,
+    {
+      render: ({ renderDetails }: RenderProps) => {
+        return (
+          <div className="flex flex-row justify-evenly">
+            {renderDetails({
+              id: "createdAt",
+              title: "Created At",
+              editable: false,
+            })}
+            {renderDetails({
+              id: "lastExecutedAt",
+              title: "Last Executed",
+              placeholder: "Enter Last Executed Date",
+              editable: false,
+            })}
+            <div className="flex flex-1"></div>
+          </div>
+        );
+      },
+    },
+    {
+      id: "precondition",
+      title: "Precondition",
+      placeholder: "Enter Precondition",
+    },
+    {
+      id: "steps",
+      title: "Steps",
+      placeholder: "Enter Steps",
+      multiline: true,
+      onChange: (e) => setValue("steps", e.currentTarget.value),
+    },
+    {
+      id: "data",
+      title: "Data",
+      placeholder: "Enter Test Data",
+      multiline: true,
+      onChange: (e) => setValue("data", e.currentTarget.value),
+    },
+    {
+      id: "expected",
+      title: "Expected Result",
+      placeholder: "Enter Expected Result",
+    },
+    {
+      id: "script",
+      title: "Test Script",
+      placeholder: "Enter Test Script",
+    },
+    {
+      id: "result",
+      title: "Actual Result",
+      placeholder: "Enter Actual Result",
+    },
   ];
 
   return (

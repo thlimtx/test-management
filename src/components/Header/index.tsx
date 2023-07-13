@@ -5,8 +5,9 @@ import { Project } from "@prisma/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import { Dropdown, Image, MenuProps } from "antd";
-import { find, includes, isEmpty, map, without } from "lodash";
+import { find, includes, isEmpty, map, take, without } from "lodash";
 import { signIn, signOut, useSession } from "next-auth/react";
+const logo = require("@/asset/icons/logo.png");
 
 export const Header = (props: any) => {
   const router = useRouter();
@@ -17,12 +18,15 @@ export const Header = (props: any) => {
 
   const [projects, setProjects] = useState<Project[]>();
   const curProject = find(projects, (o) => `${o.id}` === projectId);
-  const projectOptions = map(
-    projectId ? without(projects, curProject) : projects,
-    (item) => {
-      return { key: `${item?.id}`, label: `${item?.name}` };
-    }
-  );
+  const projectOptions = [
+    ...take(
+      map(projectId ? without(projects, curProject) : projects, (item) => {
+        return { key: `${item?.id}`, label: `${item?.name}` };
+      }),
+      5
+    ),
+    { key: "viewAll", label: "View All" },
+  ];
   const profileOptions: MenuProps["items"] = [
     { key: "profile", label: "Profile" },
     { key: "logout", label: "Log out" },
@@ -59,7 +63,9 @@ export const Header = (props: any) => {
   };
 
   const onSelectProject: MenuProps["onClick"] = ({ key }) => {
-    router.push("/project/" + key + "/dashboard");
+    key === "viewAll"
+      ? router.push("/home")
+      : router.push("/project/" + key + "/dashboard");
   };
   const onSelectProfile: MenuProps["onClick"] = ({ key }) => {
     key === "profile" && router.push("/profile");
@@ -73,13 +79,12 @@ export const Header = (props: any) => {
     >
       <div className="flex-1 flex flex-row px-5 items-center">
         <Image
-          src="https://picsum.photos/30"
+          src={logo.default.src}
           preview={false}
           width={30}
-          height={30}
-          alt="web icon"
+          alt="logo"
           onClick={() => router.push("/")}
-          className="object-cover"
+          className="object-cover button"
         />
         <span className="w-10" />
         <p className="nav-item" onClick={() => router.push("/home")}>
@@ -87,7 +92,7 @@ export const Header = (props: any) => {
         </p>
       </div>
       <div className="flex flex-row mx-5">
-        {!isEmpty(projectOptions) && (
+        {!isEmpty(projects) && (
           <Dropdown
             menu={{ items: projectOptions, onClick: onSelectProject }}
             trigger={["click"]}

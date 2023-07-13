@@ -13,19 +13,6 @@ import { ColumnsType } from "antd/es/table";
 import { capitalize, get, toLower } from "lodash";
 import { colors } from "@/util/color";
 
-const deployFields = [
-  {
-    id: "description",
-    title: "Description",
-    placeholder: "Enter Description",
-  },
-  {
-    id: "script",
-    title: "Script",
-    placeholder: "Enter script",
-  },
-];
-
 const deployLogColumns: ColumnsType<any> = [
   {
     title: "ID",
@@ -63,7 +50,7 @@ const Deploy = (props: any) => {
   const { id, projectId } = deploy ?? {};
 
   const router = useRouter();
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
 
   const editPermission = getPermission({
     action: "edit",
@@ -106,7 +93,18 @@ const Deploy = (props: any) => {
         onPressSave={handleSubmit(onSubmit)}
         data={deploy}
         fields={[
-          ...deployFields,
+          {
+            id: "description",
+            title: "Description",
+            placeholder: "Enter Description",
+            multiline: true,
+            onChange: (e) => setValue("description", e.currentTarget.value),
+          },
+          {
+            id: "script",
+            title: "Script",
+            placeholder: "Enter script",
+          },
           {
             render: ({}) => {
               return (

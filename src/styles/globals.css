@@ -11,13 +11,14 @@
   --primary-color: #8000ff;
 }
 
-@media (prefers-color-scheme: dark) {
+/* backlog: dark theme */
+/* @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
   }
-}
+} */
 
 body {
   color: rgb(var(--foreground-rgb));

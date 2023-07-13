@@ -11,7 +11,7 @@ export const FormDropdown = (props: FormDropdownProps) => {
   const onSelectDropdown: MenuProps["onClick"] = ({ key }) => onSelect(id, key);
   return (
     <div>
-      <p className="text-fade text-xs">{title}</p>
+      <p className="text-fade text-xs my-1.5">{title}</p>
       <Dropdown
         menu={{
           items: options,

@@ -27,7 +27,7 @@ const Requirements = (props: any) => {
   });
 
   const [isEditing, setIsEditing] = useState(false);
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
 
   const updateRequirement = async (item: any) => {
     const res = await fetch("../../../api/requirement/update", {
@@ -86,6 +86,8 @@ const Requirements = (props: any) => {
             id: "description",
             title: "Description",
             placeholder: "Enter Description",
+            multiline: true,
+            onChange: (e) => setValue("description", e.currentTarget.value),
           },
           {
             id: "createdAt",
