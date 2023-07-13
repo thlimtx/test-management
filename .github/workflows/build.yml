@@ -19,3 +19,6 @@ jobs:
 
       - name: Build project
         run: yarn build
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
