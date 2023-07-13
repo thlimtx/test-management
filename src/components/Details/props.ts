@@ -74,6 +74,11 @@ export type DetailsProps = {
    */
   onPressSave?: () => void;
   /**
+   * On press run
+   * @returns void
+   */
+  onPressRun?: () => void;
+  /**
    * useForm register function
    */
   register?: UseFormRegister<FieldValues>;

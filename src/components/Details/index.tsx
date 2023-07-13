@@ -6,6 +6,7 @@ import {
   faArrowLeft,
   faFloppyDisk,
   faPen,
+  faPlay,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { get, has, isEmpty } from "lodash";
@@ -21,6 +22,7 @@ export const Details = (props: DetailsProps) => {
     onPressEdit,
     onPressSave,
     onPressCancel,
+    onPressRun,
     editable,
     isEditing,
   } = props;
@@ -116,6 +118,16 @@ export const Details = (props: DetailsProps) => {
                 type="invert"
                 textClassName="text-textPrimary"
                 onPress={onPressEdit}
+              />
+            )}
+            {has(props, "onPressRun") && (
+              <Button
+                text="Run"
+                className="ml-3 border-textPrimary"
+                icon={faPlay}
+                type="invert"
+                textClassName="text-textPrimary"
+                onPress={onPressRun}
               />
             )}
           </div>
