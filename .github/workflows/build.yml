@@ -19,3 +19,6 @@ jobs:
 
       - name: Build project
         run: yarn build
+
+      - name: Run tests
+        run: npx jest
