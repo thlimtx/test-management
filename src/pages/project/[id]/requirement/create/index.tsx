@@ -44,14 +44,14 @@ const CreateRequirement = (props: any) => {
   const onPressCancel = () => router.back();
   const onSubmit = (data: any) => createRequirement(data);
 
-  const renderDetails = (title: string, id: string) => {
+  const renderDetails = (title: string, id: string, options?: any) => {
     return (
       <div>
         <p className="text-fade text-xs">{title}</p>
         <TextInput
           id={id}
           register={register}
-          registerOptions={{ required: true }}
+          registerOptions={options ?? {}}
           placeholder={`Enter ${title}`}
         />
       </div>
@@ -83,8 +83,8 @@ const CreateRequirement = (props: any) => {
           </div>
         </div>
         <div className="p-4 my-2 bg-primaryBg shadow">
-          {renderDetails("Requirement Code", "code")}
-          {renderDetails("Name", "title")}
+          {renderDetails("Requirement Code", "code", { required: true })}
+          {renderDetails("Name", "title", { required: true })}
           {renderDetails("Description", "description")}
         </div>
       </div>
