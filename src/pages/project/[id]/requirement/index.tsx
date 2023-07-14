@@ -140,6 +140,7 @@ const Requirements = (props: any) => {
             columns={columns}
             dataSource={requirements}
             rowKey={(data) => `${data.id}`}
+            pagination={{ pageSize: 10 }}
           />
         </div>
       </div>

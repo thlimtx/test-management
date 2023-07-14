@@ -130,7 +130,8 @@ const TestPlans = (props: any) => {
     }
   };
 
-  const onPressBack = () => router.push(replace(router.asPath, id, ""));
+  const onPressBack = () =>
+    router.push(replace(router.asPath, `test-plan/${id}`, "test-plan"));
   const onPressCancel = () => setIsEditing(false);
   const onPressEdit = () => setIsEditing(true);
 
