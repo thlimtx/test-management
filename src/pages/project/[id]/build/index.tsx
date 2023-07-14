@@ -115,7 +115,7 @@ const Build = (props: any) => {
                   <input
                     className="bg-primaryBg"
                     type="password"
-                    value={text}
+                    value={text ?? ""}
                     disabled
                   />
                 ),
@@ -123,13 +123,13 @@ const Build = (props: any) => {
           },
           {
             id: "runEndpoint",
-            title: "Deploy Endpoint",
-            placeholder: "Enter deployment endpoint",
+            title: "Build Endpoint",
+            placeholder: "Enter build endpoint",
           },
           {
             id: "getEndpoint",
-            title: "Deployment Log Endpoint",
-            placeholder: "Enter deployment log endpoint",
+            title: "Build Log Endpoint",
+            placeholder: "Enter build log endpoint",
           },
           {
             render: ({}) => {
