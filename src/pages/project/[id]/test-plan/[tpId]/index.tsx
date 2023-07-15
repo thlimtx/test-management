@@ -25,7 +25,9 @@ import { getServerSession } from "next-auth";
 import authOptions from "@/pages/api/auth/[...nextauth]";
 import { colors } from "@/util/color";
 import { RenderProps } from "@/components/Details/props";
-import { TestCase } from "@prisma/client";
+import { TestCase, TestStatus } from "@prisma/client";
+import { FormDropdown } from "@/components/FormDropdown";
+import { getDropdownOptionsbyType } from "@/util/data";
 
 const requirementsColumns: ColumnsType<any> = [
   {
@@ -61,7 +63,7 @@ const TestPlans = (props: any) => {
   const [searchTC, setSearchTC] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteData, setDeleteData] = useState<TestCase>();
-  const { register, handleSubmit, setValue } = useForm();
+  const { register, handleSubmit, setValue, watch } = useForm();
 
   const testCases = filter(
     testCase,
@@ -245,8 +247,11 @@ const TestPlans = (props: any) => {
             onChange: (e) => setValue("description", e.currentTarget.value),
           },
           {
-            render: ({ renderDetails, data }: RenderProps) => {
+            render: ({ renderDetails, data, isEditing }: RenderProps) => {
               const statusColor = get(colors, toLower(data.status));
+              const value = capitalize(watch("status") || get(data, "status"));
+              const onSelect = (key: string, value?: string) =>
+                setValue(key, value);
               return (
                 <div className="flex flex-row justify-evenly">
                   {renderDetails({
@@ -260,17 +265,29 @@ const TestPlans = (props: any) => {
                     placeholder: "Enter Last Executed Date",
                     editable: false,
                   })}
-                  <div
-                    className={`flex flex-1 flex-col`}
-                    style={{ color: statusColor }}
-                  >
-                    {renderDetails({
-                      id: "status",
-                      title: "Status",
-                      editable: false,
-                      renderText: (text: any) => capitalize(text),
-                    })}
-                  </div>
+                  {isEditing ? (
+                    <FormDropdown
+                      register={register}
+                      id="status"
+                      title="Status"
+                      options={getDropdownOptionsbyType(TestStatus)}
+                      value={value}
+                      onSelect={onSelect}
+                      key={id}
+                    />
+                  ) : (
+                    <div
+                      className={`flex flex-1 flex-col`}
+                      style={{ color: statusColor }}
+                    >
+                      {renderDetails({
+                        id: "status",
+                        title: "Status",
+                        editable: false,
+                        renderText: (text: any) => capitalize(text),
+                      })}
+                    </div>
+                  )}
                 </div>
               );
             },
