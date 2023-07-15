@@ -4,13 +4,26 @@ import { prisma } from "server/db/client";
 import { Dropdown, MenuProps, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { Button } from "@/components/Button";
-import { faChartSimple, faGear } from "@fortawesome/free-solid-svg-icons";
+import { faChartSimple } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { Config, DashboardView } from "@prisma/client";
-import { getDropdownOptionsbyType } from "@/util/data";
 import { colors } from "@/util/color";
 import { useRouter } from "next/router";
-import { filter, find, get, map, remove } from "lodash";
+import {
+  capitalize,
+  filter,
+  find,
+  get,
+  head,
+  includes,
+  last,
+  map,
+  orderBy,
+  size,
+  toLower,
+  toUpper,
+} from "lodash";
+import { PieChart } from "react-minimal-pie-chart";
 
 const columns: ColumnsType<any> = [
   {
@@ -41,7 +54,7 @@ const columns: ColumnsType<any> = [
 ];
 
 const Dashboard = (props: any) => {
-  const { testResults, project } = props;
+  const { project } = props;
   const router = useRouter();
   const projectId = parseInt(router.query.id as string);
   const { githubOwner, githubProject, dashboardView } =
@@ -54,7 +67,6 @@ const Dashboard = (props: any) => {
   useEffect(() => {
     view === DashboardView.TEST && getTestLog();
     view === DashboardView.GITHUB_ACITON && getGitLog({});
-    view === DashboardView.ALL && getTestLog();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -70,7 +82,7 @@ const Dashboard = (props: any) => {
             id: o.id,
             name: o.name,
             duration: formateRuntime(o.updated_at, o.run_started_at),
-            updatedAt: formatDate(o.run_started_at),
+            updatedAt: o.run_started_at,
             status: o.conclusion,
           };
         })
@@ -92,7 +104,7 @@ const Dashboard = (props: any) => {
             id: o.id,
             code: o.code,
             name: o.title,
-            updatedAt: formatDate(o.updatedAt),
+            updatedAt: o.updatedAt,
             status: o.status,
           };
         })
@@ -142,11 +154,19 @@ const Dashboard = (props: any) => {
         title: "Last Updated",
         dataIndex: "updatedAt",
         key: "updatedAt",
+        render: (text: any) => formatDate(text),
       },
       {
         title: "Status",
         dataIndex: "status",
         key: "status",
+        render: (value) => {
+          return (
+            <p style={{ color: get(colors, toLower(value)) }}>
+              {capitalize(value)}
+            </p>
+          );
+        },
       },
     ],
     (o) =>
@@ -156,10 +176,6 @@ const Dashboard = (props: any) => {
   );
 
   const viewOptions: MenuProps["items"] = [
-    {
-      key: DashboardView.ALL,
-      label: "Build, Test, and Deploy",
-    },
     {
       key: DashboardView.TEST,
       label: "Test",
@@ -179,6 +195,86 @@ const Dashboard = (props: any) => {
       disabled: !isGitConfigured,
     },
   ];
+
+  const renderTestView = () => {
+    const logByUpdatedAt = orderBy(log, ["updatedAt"], ["asc"]);
+    const latest = last(logByUpdatedAt);
+    const oldest = head(logByUpdatedAt);
+    const sizeOfTests = size(log);
+    const sizeOfPass =
+      size(filter(log, (item) => includes(toUpper(item.status), "PASS"))) /
+      sizeOfTests;
+    const sizeOfFail =
+      size(filter(log, (item) => includes(toUpper(item.status), "FAIL"))) /
+      sizeOfTests;
+    const sizeOfPending =
+      size(filter(log, (item) => includes(toUpper(item.status), "PENDING"))) /
+      sizeOfTests;
+
+    const pieData = [
+      { title: "Passed", value: sizeOfPass, color: colors.success },
+      { title: "Fail", value: sizeOfFail, color: colors.failed },
+      { title: "Pending", value: sizeOfPending, color: colors.pending },
+    ];
+
+    return (
+      <div className="flex flex-row">
+        <PieChart data={pieData} className="w-56" />
+        <div className="ml-5">
+          <p className="font-bold">Test Case Dates</p>
+          <div className="flex flex-row">
+            <div>
+              <p>Latest - {latest?.code}</p>
+              <p>{formatDate(latest?.updatedAt)}</p>
+            </div>
+            <span className="w-5" />
+            <div>
+              <p>Oldest - {oldest?.code}</p>
+              <p>{formatDate(oldest?.updatedAt)}</p>
+            </div>
+          </div>
+          <div className="flex flex-row my-3">
+            <div>
+              <p className="font-bold">Latest Results</p>
+              <div>
+                {map(pieData, (data) => {
+                  return (
+                    <div className="flex flex-row my-2 items-center">
+                      <div
+                        className="w-2 h-2 rounded-full mr-2"
+                        style={{ backgroundColor: data.color }}
+                      />
+                      <p className="flex flex-1 mr-2">{data.title}:</p>
+                      <p>{data.value * 100}%</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <span className="w-5" />
+            <div>
+              <p>No. of tests</p>
+              {map(pieData, (data) => {
+                return (
+                  <p className="text-center my-2">
+                    {size(
+                      filter(log, (item) =>
+                        includes(toUpper(item.status), toUpper(data.title))
+                      )
+                    )}
+                  </p>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderGitHubView = () => {
+    return <div></div>;
+  };
 
   return (
     <Screen sidebar>
@@ -210,8 +306,9 @@ const Dashboard = (props: any) => {
           </Dropdown>
         </div>
         <div className="p-4 my-2 bg-primaryBg shadow">
-          <p className="text-xl font-bold">Overview</p>
-          <p className="text-xl font-bold">Log</p>
+          <p className="text-xl font-bold mb-3">Overview</p>
+          {view !== DashboardView.GITHUB_ACITON && renderTestView()}
+          <p className="text-xl font-bold my-3">Log</p>
           <Table
             columns={columns}
             dataSource={log}
