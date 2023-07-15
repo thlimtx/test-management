@@ -31,13 +31,13 @@ const authOptions: NextAuthOptions = {
           include: { member: true },
         });
         if (!user) {
-          throw new Error("Invalid login.");
+          throw new Error("Invalid login credentials.");
         }
 
         const isPasswordValid = await compare(password, user.password);
 
         if (!isPasswordValid) {
-          throw new Error("Invalid login.");
+          throw new Error("Invalid login credentials.");
         }
 
         return {

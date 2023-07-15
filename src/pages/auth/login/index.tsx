@@ -16,9 +16,7 @@ const Login = () => {
       password: data.password,
       redirect: false,
     });
-    res?.ok
-      ? router.push("/home")
-      : setErrorMessage("Invalid Login credentials");
+    res?.ok ? router.push("/home") : setErrorMessage(res?.error as string);
   };
   return (
     <Screen>
