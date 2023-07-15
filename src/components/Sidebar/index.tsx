@@ -29,7 +29,7 @@ export const Sidebar = (props: any) => {
         <div className="flex w-16 h-16 items-center justify-center">
           <FontAwesomeIcon icon={item.icon} size="lg" />
         </div>
-        {item.name}
+        <p className="whitespace-nowrap sidebar-label">{item.name}</p>
       </div>
     );
   };

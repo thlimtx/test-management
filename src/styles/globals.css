@@ -72,6 +72,13 @@ body {
 
 @media screen and (max-width: 800px) {
   .sidebar {
+    width: 42px;
+    overflow: hidden;
+  }
+  .sidebar-frame {
+    width: 42px;
+  }
+  .sidebar-label {
     display: none;
   }
 }
