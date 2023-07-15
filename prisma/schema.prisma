@@ -35,6 +35,7 @@ model Project {
   testResults  TestResult[]
   build        Build?
   deploy       Deploy?
+  config       Config?
 }
 
 model Member {
@@ -187,4 +188,20 @@ model DeployLog {
   createdAt DateTime   @default(now())
   duration  String
   status    TestStatus @default(PENDING)
+}
+
+enum DashboardView {
+  TEST
+  ALL
+  GITHUB_ACITON
+}
+
+model Config {
+  projectId Int     @unique
+  project   Project @relation(fields: [projectId], references: [id])
+
+  createdAt     DateTime @default(now())
+  dashboardView DashboardView @default(ALL)
+  githubOwner   String?
+  githubProject String?
 }

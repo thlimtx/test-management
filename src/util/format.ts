@@ -20,3 +20,11 @@ export const formatDuration = (time: any, format?: any) => {
     .replace("S", "");
   return durationDisplay;
 };
+
+export const formateRuntime = (curValue: any, targetValue: any) => {
+  return (
+    formatDuration(moment(curValue).diff(targetValue))
+      .split(".")[0]
+      .replace(":", "m") + "s"
+  );
+};
