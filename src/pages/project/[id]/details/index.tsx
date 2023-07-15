@@ -41,6 +41,8 @@ const ProjectDetails = (props: any) => {
   const { project, user } = props;
   const data = {
     ...project,
+    githubOwner: project.config?.githubOwner,
+    githubProject: project.config?.githubProject,
   };
   const projectId = project?.id;
 
@@ -48,7 +50,7 @@ const ProjectDetails = (props: any) => {
 
   const { id } = data;
   const [isEditing, setIsEditing] = useState(false);
-  const { register, handleSubmit, setValue } = useForm();
+  const { register, handleSubmit, setValue, watch } = useForm();
   const [members, setMembers] = useState<(Member & { user: User })[]>();
 
   const editPermission = getPermission({
@@ -128,19 +130,54 @@ const ProjectDetails = (props: any) => {
             onChange: (e) => setValue("description", e.currentTarget.value),
           },
           {
-            id: "version",
-            title: "Version",
-            placeholder: "Enter Version",
+            render: ({ renderDetails }) => {
+              return (
+                <div className="flex flex-row">
+                  {renderDetails({
+                    id: "version",
+                    title: "Version",
+                    placeholder: "Enter Version",
+                  })}
+                  <span className="w-3" />
+                  {renderDetails({
+                    id: "env",
+                    title: "Environment",
+                    placeholder: "Enter Environment",
+                  })}
+                  <span className="w-3" />
+                  {renderDetails({
+                    id: "tools",
+                    title: "Tools",
+                    placeholder: "Enter Tools",
+                  })}
+                </div>
+              );
+            },
           },
           {
-            id: "env",
-            title: "Environment",
-            placeholder: "Enter Environment",
-          },
-          {
-            id: "tools",
-            title: "Tools",
-            placeholder: "Enter Tools",
+            render: ({ renderDetails }) => {
+              return (
+                <div className="flex flex-row">
+                  {renderDetails({
+                    id: "githubOwner",
+                    title: "GitHub Owner",
+                    placeholder: "Enter GitHub Owner",
+                  })}
+                  <span className="w-3" />
+                  {renderDetails({
+                    id: "githubProject",
+                    title: "GitHub Project Name",
+                    placeholder: "Enter GitHub Project Name",
+                  })}
+                  <span className="w-3" />
+                  {renderDetails({
+                    id: "tools",
+                    title: "Tools",
+                    placeholder: "Enter Tools",
+                  })}
+                </div>
+              );
+            },
           },
           {
             render: ({}) => {
@@ -194,6 +231,7 @@ export const getServerSideProps = async (context: any) => {
       members: {
         include: { user: true },
       },
+      config: true,
     },
   });
   return {
