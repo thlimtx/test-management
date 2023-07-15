@@ -3,13 +3,13 @@ import { find, includes, intersection, isEmpty } from "lodash";
 
 export const permissions = [
   { route: "requirement", action: "edit", role: [Role.OWNER] },
-  { route: "build", action: "edit", role: [Role.TESTER] },
-  { route: "build", action: "run", role: [Role.TESTER] },
-  { route: "test-plan", action: "edit", role: [Role.TESTER] },
-  { route: "test-case", action: "edit", role: [Role.TESTER] },
-  { route: "test-case", action: "run", role: [Role.TESTER] },
-  { route: "deploy", action: "edit", role: [Role.QA] },
-  { route: "deploy", action: "run", role: [Role.QA] },
+  { route: "build", action: "edit", role: [Role.OWNER, Role.TESTER] },
+  { route: "build", action: "run", role: [Role.OWNER, Role.TESTER] },
+  { route: "test-plan", action: "edit", role: [Role.OWNER, Role.TESTER] },
+  { route: "test-case", action: "edit", role: [Role.OWNER, Role.TESTER] },
+  { route: "test-case", action: "run", role: [Role.OWNER, Role.TESTER] },
+  { route: "deploy", action: "edit", role: [Role.OWNER, Role.QA] },
+  { route: "deploy", action: "run", role: [Role.OWNER, Role.QA] },
   { route: "details", action: "edit", role: [Role.OWNER] },
   { route: "members", action: "edit", role: [Role.OWNER] },
 ];
