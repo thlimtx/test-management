@@ -4,7 +4,11 @@ import { prisma } from "server/db/client";
 import { Dropdown, MenuProps, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { Button } from "@/components/Button";
-import { faChartSimple } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChartSimple,
+  faCircleCheck,
+  faCircleXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { Config, DashboardView } from "@prisma/client";
 import { colors } from "@/util/color";
@@ -24,6 +28,7 @@ import {
   toUpper,
 } from "lodash";
 import { PieChart } from "react-minimal-pie-chart";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const columns: ColumnsType<any> = [
   {
@@ -62,7 +67,9 @@ const Dashboard = (props: any) => {
   const isGitConfigured = githubOwner && githubProject;
 
   const [log, setLog] = useState<any>();
+  const [buildData, setBuildData] = useState<any>();
   const [view, setView] = useState<string>(dashboardView);
+  console.log(buildData);
 
   useEffect(() => {
     view === DashboardView.TEST && getTestLog();
@@ -76,17 +83,28 @@ const Dashboard = (props: any) => {
       { method: "GET" }
     );
     if (res.ok) {
-      setLog(
-        map(get(await res.json(), "workflow_runs"), (o) => {
-          return {
-            id: o.id,
-            name: o.name,
-            duration: formateRuntime(o.updated_at, o.run_started_at),
-            updatedAt: o.run_started_at,
-            status: o.conclusion,
-          };
-        })
-      );
+      const logData = map(get(await res.json(), "workflow_runs"), (o) => {
+        return {
+          id: o.id,
+          name: o.name,
+          duration: formateRuntime(o.updated_at, o.run_started_at),
+          updatedAt: o.run_started_at,
+          status: o.conclusion,
+          jobsUrl: o.jobs_url,
+        };
+      });
+      setLog(logData);
+      getGitRun({ url: head(logData)?.jobsUrl });
+    } else {
+      alert("Failed to generate results.");
+    }
+  };
+
+  const getGitRun = async (item: any) => {
+    const res = await fetch(item?.url, { method: "GET" });
+    if (res.ok) {
+      const resData = await res.json();
+      setBuildData(head(resData?.jobs));
     } else {
       alert("Failed to generate results.");
     }
@@ -237,9 +255,9 @@ const Dashboard = (props: any) => {
             <div>
               <p className="font-bold">Latest Results</p>
               <div>
-                {map(pieData, (data) => {
+                {map(pieData, (data, key) => {
                   return (
-                    <div className="flex flex-row my-2 items-center">
+                    <div className="flex flex-row my-2 items-center" key={key}>
                       <div
                         className="w-2 h-2 rounded-full mr-2"
                         style={{ backgroundColor: data.color }}
@@ -254,9 +272,9 @@ const Dashboard = (props: any) => {
             <span className="w-5" />
             <div>
               <p>No. of tests</p>
-              {map(pieData, (data) => {
+              {map(pieData, (data, key) => {
                 return (
-                  <p className="text-center my-2">
+                  <p className="text-center my-2" key={key}>
                     {size(
                       filter(log, (item) =>
                         includes(toUpper(item.status), toUpper(data.title))
@@ -273,7 +291,55 @@ const Dashboard = (props: any) => {
   };
 
   const renderGitHubView = () => {
-    return <div></div>;
+    const { workflow_name, started_at, completed_at, conclusion, steps } =
+      buildData || {};
+    return (
+      <div className="">
+        <p className="font-bold">Latest Build</p>
+        <div className="flex flex-row">
+          <div className="flex flex-col">
+            <div className="my-1">
+              <p className="text-fade text-xs">Name</p>
+              <p>{workflow_name}</p>
+            </div>
+            <div className="my-1">
+              <p className="text-fade text-xs">Duration</p>
+              <p>{formateRuntime(completed_at, started_at)}</p>
+            </div>
+            <div className="my-1">
+              <p className="text-fade text-xs">Completed At</p>
+              <p>{formatDate(completed_at)}</p>
+            </div>
+            <div>
+              <p className="text-fade text-xs">Status</p>
+              <p style={{ color: get(colors, toLower(conclusion)) }}>
+                {conclusion}
+              </p>
+            </div>
+          </div>
+          <span className="w-10" />
+          <div>
+            <p className="text-fade text-xs">Steps</p>
+            {map(steps, (step, key) => {
+              return (
+                <div className="flex flex-row items-center" key={key}>
+                  <FontAwesomeIcon
+                    icon={
+                      step.conclusion === "success"
+                        ? faCircleCheck
+                        : faCircleXmark
+                    }
+                    color={get(colors, toLower(step.conclusion))}
+                  />
+                  <span className="w-3" />
+                  <p>{step.name}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -308,6 +374,7 @@ const Dashboard = (props: any) => {
         <div className="p-4 my-2 bg-primaryBg shadow">
           <p className="text-xl font-bold mb-3">Overview</p>
           {view !== DashboardView.GITHUB_ACITON && renderTestView()}
+          {view === DashboardView.GITHUB_ACITON && renderGitHubView()}
           <p className="text-xl font-bold my-3">Log</p>
           <Table
             columns={columns}
