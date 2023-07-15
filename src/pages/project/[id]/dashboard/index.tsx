@@ -69,7 +69,6 @@ const Dashboard = (props: any) => {
   const [log, setLog] = useState<any>();
   const [buildData, setBuildData] = useState<any>();
   const [view, setView] = useState<string>(dashboardView);
-  console.log(buildData);
 
   useEffect(() => {
     view === DashboardView.TEST && getTestLog();
