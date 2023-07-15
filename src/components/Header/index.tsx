@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { Button } from "../Button";
 import { useEffect, useState } from "react";
-import { Project } from "@prisma/client";
+import { Project, User } from "@prisma/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import { Dropdown, Image, MenuProps } from "antd";
@@ -13,8 +13,8 @@ export const Header = (props: any) => {
   const router = useRouter();
   const projectId = router.query.id;
   const session = useSession();
-
-  const user = session.data?.user;
+  const sessionUser = session.data?.user || {};
+  const [user, setUser] = useState<User>();
 
   const [projects, setProjects] = useState<Project[]>();
   const curProject = find(projects, (o) => `${o.id}` === projectId);
@@ -33,9 +33,10 @@ export const Header = (props: any) => {
   ];
 
   useEffect(() => {
-    user && findProject(user?.email);
+    sessionUser && findProject(sessionUser?.email);
+    sessionUser && getUser({ email: sessionUser.email });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId, user]);
+  }, [projectId, session]);
   useEffect(() => {
     if (
       session.status !== "loading" &&
@@ -48,6 +49,17 @@ export const Header = (props: any) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, session]);
+
+  const getUser = async (item: any) => {
+    const res = await fetch("/api/user/find", {
+      method: "POST",
+      body: JSON.stringify({ ...item }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setUser(data);
+    }
+  };
 
   const findProject = async (item: any) => {
     const res = await fetch("/api/project/read", {
@@ -119,8 +131,8 @@ export const Header = (props: any) => {
               {user.image ? (
                 <Image
                   src={user.image}
-                  width={24}
-                  height={24}
+                  width={30}
+                  height={30}
                   alt="profile picture"
                   className="rounded-full object-cover"
                 />
