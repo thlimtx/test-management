@@ -5,7 +5,7 @@ import { TextInput } from "@/components/TextInput";
 import { formatDate, jsonParse } from "@/util/format";
 import { faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Table } from "antd";
+import { Modal, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import {
   capitalize,
@@ -25,6 +25,7 @@ import { getServerSession } from "next-auth";
 import authOptions from "@/pages/api/auth/[...nextauth]";
 import { colors } from "@/util/color";
 import { RenderProps } from "@/components/Details/props";
+import { TestCase } from "@prisma/client";
 
 const requirementsColumns: ColumnsType<any> = [
   {
@@ -36,37 +37,6 @@ const requirementsColumns: ColumnsType<any> = [
     title: "Description",
     dataIndex: "description",
     key: "description",
-  },
-];
-
-const testCaseColumns: ColumnsType<any> = [
-  {
-    title: "Title",
-    dataIndex: "title",
-    key: "title",
-  },
-  {
-    title: "Description",
-    dataIndex: "description",
-    key: "description",
-  },
-  {
-    title: "Last Executed",
-    dataIndex: "lastExecutedAt",
-    key: "lastExecutedAt",
-    render: (value) => formatDate(value),
-  },
-  {
-    title: "Status",
-    dataIndex: "status",
-    key: "status",
-    render: (value) => {
-      return (
-        <p style={{ color: get(colors, toLower(value)) }}>
-          {capitalize(value)}
-        </p>
-      );
-    },
   },
 ];
 
@@ -89,6 +59,8 @@ const TestPlans = (props: any) => {
   const [isEditing, setIsEditing] = useState(false);
   const [searchReq, setSearchReq] = useState("");
   const [searchTC, setSearchTC] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteData, setDeleteData] = useState<TestCase>();
   const { register, handleSubmit, setValue } = useForm();
 
   const testCases = filter(
@@ -129,6 +101,17 @@ const TestPlans = (props: any) => {
       alert("Failed to remove reference");
     }
   };
+  const deleteTestCase = async (item: any) => {
+    const res = await fetch("../../../api/test-case/delete", {
+      method: "POST",
+      body: JSON.stringify({ ...item }),
+    });
+    if (res.ok) {
+      router.replace(router.asPath);
+    } else {
+      alert("Failed to delete requirement");
+    }
+  };
 
   const onPressBack = () =>
     router.push(replace(router.asPath, `test-plan/${id}`, "test-plan"));
@@ -146,6 +129,10 @@ const TestPlans = (props: any) => {
 
   const onPressRemove = (id: any) => {
     removeReference({ reqId: id });
+  };
+  const onPressDelete = (id: any) => {
+    deleteTestCase({ id });
+    setIsModalOpen(false);
   };
 
   const columns: ColumnsType<any> = [
@@ -167,6 +154,55 @@ const TestPlans = (props: any) => {
           width: 50,
         }
       : {},
+  ];
+
+  const testCaseColumns: ColumnsType<any> = [
+    {
+      title: "Title",
+      dataIndex: "title",
+      key: "title",
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "Last Executed",
+      dataIndex: "lastExecutedAt",
+      key: "lastExecutedAt",
+      render: (value) => formatDate(value),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (value) => {
+        return (
+          <p style={{ color: get(colors, toLower(value)) }}>
+            {capitalize(value)}
+          </p>
+        );
+      },
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => {
+        return (
+          <FontAwesomeIcon
+            className="button self-center"
+            style={{ color: "red" }}
+            onClick={() => {
+              setDeleteData(record);
+              setIsModalOpen(true);
+            }}
+            icon={faXmark}
+          />
+        );
+      },
+      width: 50,
+    },
   ];
 
   return (
@@ -340,6 +376,18 @@ const TestPlans = (props: any) => {
                     dataSource={testCases}
                     rowKey={(data) => `${data.id}`}
                   />
+                  <Modal
+                    title={`Delete ${deleteData?.code} ${deleteData?.title}`}
+                    open={!!deleteData && isModalOpen}
+                    onOk={() => onPressDelete(deleteData?.id)}
+                    onCancel={() => setIsModalOpen(false)}
+                    okButtonProps={{
+                      style: { backgroundColor: "red" },
+                      className: "button",
+                    }}
+                  >
+                    <p>Are you sure?</p>
+                  </Modal>
                 </div>
               );
             },

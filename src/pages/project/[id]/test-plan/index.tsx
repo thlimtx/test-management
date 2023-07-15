@@ -4,15 +4,17 @@ import { TextInput } from "@/components/TextInput";
 import { formatDate, jsonParse } from "@/util/format";
 import { useRouter } from "next/router";
 import { prisma } from "server/db/client";
-import { Table } from "antd";
+import { Modal, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { capitalize, debounce, get, toLower } from "lodash";
+import { capitalize, debounce, get, map, toLower } from "lodash";
 import { colors } from "@/util/color";
 import { getPermission } from "@/permission/data";
 import { useEffect, useState } from "react";
-import { TestPlan } from "@prisma/client";
+import { TestCase, TestPlan } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import authOptions from "@/pages/api/auth/[...nextauth]";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
 const TestPlans = (props: any) => {
   const { user } = props;
@@ -26,6 +28,10 @@ const TestPlans = (props: any) => {
     user,
   });
   const [testPlans, setTestPlans] = useState<TestPlan[]>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteData, setDeleteData] = useState<
+    TestPlan & { testCase: TestCase[] }
+  >();
 
   useEffect(() => {
     getTestPlans({});
@@ -62,6 +68,7 @@ const TestPlans = (props: any) => {
 
   const onPressDelete = (id: any) => {
     deleteTestPlan({ id });
+    setIsModalOpen(false);
   };
 
   const onPressAddTestPlan = () => {
@@ -110,22 +117,24 @@ const TestPlans = (props: any) => {
         );
       },
     },
-    // TODO: handle delete
-    // {
-    //   title: "Action",
-    //   key: "action",
-    //   render: (_, record) => {
-    //     return (
-    //       <FontAwesomeIcon
-    //         className="button self-center"
-    //         style={{ color: "red" }}
-    //         onClick={() => onPressDelete(record.id)}
-    //         icon={faXmark}
-    //       />
-    //     );
-    //   },
-    //   width: 50,
-    // },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => {
+        return (
+          <FontAwesomeIcon
+            className="button self-center"
+            style={{ color: "red" }}
+            onClick={() => {
+              setDeleteData(record);
+              setIsModalOpen(true);
+            }}
+            icon={faXmark}
+          />
+        );
+      },
+      width: 50,
+    },
   ];
 
   return (
@@ -157,6 +166,26 @@ const TestPlans = (props: any) => {
             dataSource={testPlans}
             rowKey={(data) => `${data.id}`}
           />
+          <Modal
+            title={`Delete ${deleteData?.code} ${deleteData?.title}`}
+            open={!!deleteData && isModalOpen}
+            onOk={() => onPressDelete(deleteData?.id)}
+            onCancel={() => setIsModalOpen(false)}
+            okButtonProps={{
+              style: { backgroundColor: "red" },
+              className: "button",
+            }}
+          >
+            <p>Are you sure?</p>
+            <p>You will also be deleting:</p>
+            {map(deleteData?.testCase, (item) => {
+              return (
+                <p>
+                  {item.code} {item.title}
+                </p>
+              );
+            })}
+          </Modal>
         </div>
       </div>
     </Screen>
@@ -172,13 +201,8 @@ export const getServerSideProps = async (context: any) => {
     where: { email: jsonParse(session).user.email },
     include: { member: true },
   });
-  const { id } = context.query;
-  const testPlans = await prisma.testPlan.findMany({
-    where: { projectId: { equals: parseInt(id) } },
-  });
   return {
     props: {
-      testPlans: jsonParse(testPlans),
       user: jsonParse(user),
     },
   };
