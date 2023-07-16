@@ -1,5 +1,5 @@
 import { Screen } from "@/components/Screen";
-import { formatDate, formatDuration, jsonParse } from "@/util/format";
+import { formatDate, formateRuntime, jsonParse } from "@/util/format";
 import { useRouter } from "next/router";
 import { prisma } from "server/db/client";
 import { Table } from "antd";
@@ -12,23 +12,18 @@ import authOptions from "@/pages/api/auth/[...nextauth]";
 import { ColumnsType } from "antd/es/table";
 import { capitalize, find, get, isArray, toLower } from "lodash";
 import { colors } from "@/util/color";
-import moment from "moment";
 
 const deployLogColumns: ColumnsType<any> = [
   {
     title: "ID",
     key: "id",
-    dataIndex: "uid",
+    render: (value) => value.id ?? value.uid,
   },
   {
     title: "Duration (s)",
     key: "duration",
     render: (value) => {
-      return (
-        formatDuration(moment(value.ready).diff(value.buildingAt))
-          .split(".")[0]
-          .replace(":", "m") + "s"
-      );
+      return formateRuntime(value.ready, value.buildingAt);
     },
   },
   {
@@ -137,7 +132,7 @@ const Deploy = (props: any) => {
                   <input
                     className="bg-primaryBg"
                     type="password"
-                    value={text}
+                    value={text ?? ""}
                     disabled
                   />
                 ),

@@ -39,14 +39,14 @@ const CreateTestPlan = (props: any) => {
   const onPressCancel = () => router.back();
   const onSubmit = (data: any) => createTestPlan(data);
 
-  const renderDetails = (title: string, id: string) => {
+  const renderDetails = (title: string, id: string, options?: any) => {
     return (
       <div>
         <p className="text-fade text-xs">{title}</p>
         <TextInput
           id={id}
           register={register}
-          registerOptions={{ required: true }}
+          registerOptions={options ?? {}}
           placeholder={`Enter ${title}`}
         />
       </div>
@@ -78,8 +78,8 @@ const CreateTestPlan = (props: any) => {
           </div>
         </div>
         <div className="p-4 my-2 bg-primaryBg shadow">
-          {renderDetails("Test Plan Code", "code")}
-          {renderDetails("Name", "title")}
+          {renderDetails("Test Plan Code", "code", { required: true })}
+          {renderDetails("Name", "title", { required: true })}
           <div>
             <p className="text-fade text-xs">Description</p>
             <textarea

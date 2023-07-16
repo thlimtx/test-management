@@ -38,6 +38,12 @@ const handler = async (req: any, res: any) => {
   if (!deploy) {
     throw new Error("Failed to create deploy.");
   }
+  const config = await prisma.config.create({
+    data: { projectId: project.id },
+  });
+  if (!config) {
+    throw new Error("Failed to create project config.");
+  }
 
   return res.status(200).json(project);
 };

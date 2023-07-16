@@ -10,6 +10,7 @@ import authOptions from "@/pages/api/auth/[...nextauth]";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { Image } from "antd";
+import { useSession } from "next-auth/react";
 
 const profileFields = [
   {
@@ -29,6 +30,7 @@ const Build = (props: any) => {
   const { id } = user ?? {};
 
   const router = useRouter();
+  const session = useSession();
   const { register, handleSubmit } = useForm();
   const inputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<any>();
@@ -54,7 +56,7 @@ const Build = (props: any) => {
   };
   const onPressEdit = () => {
     setIsEditing(true);
-    setFile(null);
+    setFile(user.image);
   };
   const onChangeFile = (e: any) => {
     const uploadedFile = e.target.files[0];

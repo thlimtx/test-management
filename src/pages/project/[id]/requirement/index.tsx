@@ -4,7 +4,7 @@ import { TextInput } from "@/components/TextInput";
 import { jsonParse } from "@/util/format";
 import { useRouter } from "next/router";
 import { prisma } from "server/db/client";
-import { Table } from "antd";
+import { Modal, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -27,6 +27,8 @@ const Requirements = (props: any) => {
     user,
   });
   const [requirements, setRequirements] = useState<Requirement[]>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteData, setDeleteData] = useState<Requirement>();
 
   useEffect(() => {
     getRequirements({});
@@ -63,6 +65,7 @@ const Requirements = (props: any) => {
 
   const onPressDelete = (id: any) => {
     deleteRequirement({ id });
+    setIsModalOpen(false);
   };
 
   const onPressAddRequirement = () => {
@@ -102,7 +105,10 @@ const Requirements = (props: any) => {
               <FontAwesomeIcon
                 className="button self-center"
                 style={{ color: "red" }}
-                onClick={() => onPressDelete(record.id)}
+                onClick={() => {
+                  setDeleteData(record);
+                  setIsModalOpen(true);
+                }}
                 icon={faXmark}
               />
             );
@@ -140,7 +146,20 @@ const Requirements = (props: any) => {
             columns={columns}
             dataSource={requirements}
             rowKey={(data) => `${data.id}`}
+            pagination={{ pageSize: 10 }}
           />
+          <Modal
+            title={`Delete ${deleteData?.code} ${deleteData?.title}`}
+            open={!!deleteData && isModalOpen}
+            onOk={() => onPressDelete(deleteData?.id)}
+            onCancel={() => setIsModalOpen(false)}
+            okButtonProps={{
+              style: { backgroundColor: "red" },
+              className: "button",
+            }}
+          >
+            <p>Are you sure?</p>
+          </Modal>
         </div>
       </div>
     </Screen>

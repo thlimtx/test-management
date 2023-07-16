@@ -43,7 +43,9 @@ const Requirements = (props: any) => {
   };
 
   const onPressBack = () =>
-    router.push(replace(router.asPath, requirement?.id, ""));
+    router.push(
+      replace(router.asPath, `requirement/${requirement?.id}`, "requirement")
+    );
   const onPressCancel = () => setIsEditing(false);
   const onPressEdit = () => setIsEditing(true);
 

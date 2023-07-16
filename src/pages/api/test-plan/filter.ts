@@ -13,6 +13,7 @@ const handler = async (req: any, res: any) => {
       projectId: { equals: projectId },
       ...filter,
     },
+    include: { testCase: true },
     orderBy: { code: "asc" },
   });
   return res.status(200).json(testPlan);

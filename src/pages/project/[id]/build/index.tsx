@@ -101,9 +101,35 @@ const Build = (props: any) => {
             onChange: (e) => setValue("description", e.currentTarget.value),
           },
           {
-            id: "script",
-            title: "Script",
-            placeholder: "Enter script",
+            id: "token",
+            title: "Token",
+            placeholder: "Enter token",
+            type: "password",
+            render: ({ renderDetails }) =>
+              renderDetails({
+                id: "token",
+                title: "Token",
+                placeholder: "Enter token",
+                type: "password",
+                renderText: (text) => (
+                  <input
+                    className="bg-primaryBg"
+                    type="password"
+                    value={text ?? ""}
+                    disabled
+                  />
+                ),
+              }),
+          },
+          {
+            id: "runEndpoint",
+            title: "Build Endpoint",
+            placeholder: "Enter build endpoint",
+          },
+          {
+            id: "getEndpoint",
+            title: "Build Log Endpoint",
+            placeholder: "Enter build log endpoint",
           },
           {
             render: ({}) => {
@@ -114,7 +140,8 @@ const Build = (props: any) => {
                   <Table
                     columns={[...buildLogColumns]}
                     dataSource={buildLog}
-                    rowKey={(data) => `${data.userId}`}
+                    pagination={{ pageSize: 10 }}
+                    rowKey={(data) => `${data.uid}`}
                   />
                 </div>
               );

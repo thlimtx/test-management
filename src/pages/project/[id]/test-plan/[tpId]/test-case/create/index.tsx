@@ -48,14 +48,14 @@ const CreateTestCase = (props: any) => {
   const onPressCancel = () => router.back();
   const onSubmit = (data: any) => createTestCase(data);
 
-  const renderDetails = (title: string, id: string) => {
+  const renderDetails = (title: string, id: string, options?: any) => {
     return (
       <div>
         <p className="text-fade text-xs">{title}</p>
         <TextInput
           id={id}
           register={register}
-          registerOptions={{ required: true }}
+          registerOptions={options || {}}
           placeholder={`Enter ${title}`}
         />
       </div>
@@ -115,8 +115,10 @@ const CreateTestCase = (props: any) => {
         </div>
         <div className="p-4 my-2 bg-primaryBg shadow">
           <div className="flex flex-row">
-            <div className="flex-1 mr-3">{renderDetails("Title", "title")}</div>
-            {renderDetails("Test Case Code", "code")}
+            <div className="flex-1 mr-3">
+              {renderDetails("Title", "title", { required: true })}
+            </div>
+            {renderDetails("Test Case Code", "code", { required: true })}
           </div>
           {renderTextArea("Description", "description")}
           <div className="flex flex-row justify-between">
