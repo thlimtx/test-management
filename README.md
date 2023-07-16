@@ -1,8 +1,89 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Start up app
+
+### Remotely
+
+The application is deployed on Vercel.
+
+https://test-management.vercel.app/
+
+### Setup locally
+
+#### Packages
+
+First, make sure you have these packages installed:
+
+1. [Java 11+](https://www.oracle.com/my/java/technologies/downloads/)
+2. [Node.js 20](https://nodejs.org/en)
+3. [Git](https://git-scm.com/downloads)
+4. [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable)
+5. [PostgreSQ](https://www.postgresql.org/download/)
+
+#### Steps
+
+1. Copy the code or Go to a desired file path and run
+
+```
+git clone https://github.com/thlimtx/test-management.git
+```
+
+2. Install dependencies by running the command in root directory of the project:
+
+```
+yarn
+```
+
+3. Create a database in postgres, whether by CLI or through pgAdmin
+
+4. Go to .env in the project repository, Keep `NEXTAUTH_SECRET` and replace `DATABASE_URL` with
+
+```
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
+```
+
+Keep `DATABASE_URL` and `NEXTAUTH_SECRET`
+
+5. Go to prisma/schema.prisma and replace db with
+
+```
+   datasource db {
+        provider = "postgresql"
+        url = env("DATABASE_URL")
+   }
+```
+
+6. Migrate database
+
+```
+npx prisma migrate dev
+```
+
+7. Run dev server and go to localhost:3000
+
+```
+yarn dev
+```
+
+8. (Optional) Manage data instead of using pgAdmin
+
+```
+yarn prisma studio
+```
+
 ## Getting Started
 
-First, run the development server:
+First, install the dependancies:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
