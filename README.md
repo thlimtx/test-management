@@ -42,8 +42,6 @@ yarn
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
 ```
 
-Keep `DATABASE_URL` and `NEXTAUTH_SECRET`
-
 5. Go to prisma/schema.prisma and replace db with
 
 ```
