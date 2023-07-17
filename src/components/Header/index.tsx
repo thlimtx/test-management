@@ -13,7 +13,7 @@ export const Header = (props: any) => {
   const router = useRouter();
   const projectId = router.query.id;
   const session = useSession();
-  const sessionUser = session.data?.user || {};
+  const sessionUser = session.data?.user;
   const [user, setUser] = useState<User>();
 
   const [projects, setProjects] = useState<Project[]>();
