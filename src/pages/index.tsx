@@ -15,7 +15,7 @@ const Landing = (props: any) => {
           </p>
           <p className="text-2xl italic ">Log in to get started.</p>
           <Button
-            className="rounded-full w-40 max-w-full py-3"
+            className="rounded-md w-40 max-w-full py-3"
             text="Get Started"
             onPress={() => router.push("/auth/login")}
           />
