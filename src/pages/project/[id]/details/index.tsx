@@ -41,8 +41,8 @@ const ProjectDetails = (props: any) => {
   const { project, user } = props;
   const data = {
     ...project,
-    githubOwner: project.config?.githubOwner,
-    githubProject: project.config?.githubProject,
+    githubOwner: project?.config?.githubOwner,
+    githubProject: project?.config?.githubProject,
   };
   const projectId = project?.id;
 
